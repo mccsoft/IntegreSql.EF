@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>MCC Soft</Authors>
+    <Description>OpenIddict extension to support Auth code flow fo built-in ASP.Net identity providers</Description>
+    <RepositoryUrl>https://github.com/mcctomsk/IntegreSql.EF</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/mcctomsk/IntegreSql.EF</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>GitHub</RepositoryType>
+    
+    
+  <TargetFramework>net6.0</TargetFramework>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <NoWarn>1591,CLASS0001;ASYNC0001;ASYNC0002;ASYNC0003;ASYNC0004;RETURN0001;VpRoslynConfigureAwaitAnalayzer</NoWarn>
+    <Description>Helper classes to use IntegreSql (and Sqlite) with EntityFramework in .Net tests.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="Npgsql" Version="6.0.3" />
+    <PackageReference Include="System.Text.Json" Version="6.0.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.4" />
+  </ItemGroup>
+
+</Project>

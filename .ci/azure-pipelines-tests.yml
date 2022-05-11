@@ -1,0 +1,15 @@
+trigger:
+  branches:
+    include:
+      - master
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: 'webapi/MccSoft.TemplateApp.sln'
+  project: 'webapi/src/MccSoft.TemplateApp.App/MccSoft.TemplateApp.App.csproj'
+
+steps:
+  - template: ./azure-pipelines-tests-shared.yml

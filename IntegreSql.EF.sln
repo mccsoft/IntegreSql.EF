@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MccSoft.IntegreSql.EF", "src\MccSoft.IntegreSql.EF\MccSoft.IntegreSql.EF.csproj", "{37E066E4-9C68-48BB-8CC6-8861239A8024}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6A62837E-674A-444E-AEF4-177681A1D816}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{0F0A5C71-7CAD-46EB-9A89-21CDDA43815D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{37E066E4-9C68-48BB-8CC6-8861239A8024}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37E066E4-9C68-48BB-8CC6-8861239A8024}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37E066E4-9C68-48BB-8CC6-8861239A8024}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37E066E4-9C68-48BB-8CC6-8861239A8024}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+EndGlobal

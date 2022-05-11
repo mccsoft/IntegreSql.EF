@@ -1,0 +1,20 @@
+# Shared steps to test everything within repository.
+steps:
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core sdk 6'
+    inputs:
+      packageType: sdk
+      version: 6.x
+
+  - script: |
+      cd scripts/integresql
+      docker-compose up -d
+    displayName: 'run integresql'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'test'
+      arguments:
+      projects: 'tests/*/*.csproj'
+      publishTestResults: true
+    displayName: 'dotnet test'
