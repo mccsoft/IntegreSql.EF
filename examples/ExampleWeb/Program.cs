@@ -15,6 +15,10 @@ builder.Services.AddDbContext<ExampleDbContext>(
 
 var app = builder.Build();
 
+// Not using migration in every test greatly speeds up the execution.
+// So you need to make sure that database schema and seed data is cached within template database.
+// (by default DB schema is created using dbContext.Database.EnsureCreated()
+// if you use CreateDatabaseGetConnectionString).
 if (app.Configuration.GetValue<bool>("DisableSeed") != true)
 {
     await app.Services
