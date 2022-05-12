@@ -6,9 +6,9 @@ using Xunit;
 
 namespace ExampleWeb.IntegrationTests;
 
-public class Postgres2Tests : IntegrationTestBase
+public class PostgresWithoutEnsureCreatedTests : IntegrationTestBaseWithoutEnsureCreated
 {
-    public Postgres2Tests() : base(DatabaseType.Postgres) { }
+    public PostgresWithoutEnsureCreatedTests() : base(DatabaseType.Postgres) { }
 
     [Fact]
     public async Task CheckDatabaseType()

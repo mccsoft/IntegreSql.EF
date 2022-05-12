@@ -1,39 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using MccSoft.IntegreSql.EF;
 using MccSoft.IntegreSql.EF.DatabaseInitialization;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ExampleWeb;
 
-public class IntegrationTestBase
+public class IntegrationTestBaseWithoutEnsureCreated
 {
     protected readonly HttpClient _httpClient;
     private readonly IDatabaseInitializer _databaseInitializer;
 
-    protected IntegrationTestBase(DatabaseType databaseType)
+    protected IntegrationTestBaseWithoutEnsureCreated(DatabaseType databaseType)
     {
         _databaseInitializer = CreateDatabaseInitializer(databaseType);
         var connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync(
-            new BasicDatabaseSeedingOptions<ExampleDbContext>(Name: "Integration2")
+            new BasicDatabaseSeedingOptions<ExampleDbContext>(
+                Name: "IntegrationWithoutEnsureCreated",
+                DisableEnsureCreated: true
+            )
         );
 
         var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(
             builder =>
             {
-                builder.ConfigureAppConfiguration(
-                    (context, configuration) =>
-                    {
-                        configuration.AddInMemoryCollection(
-                            new KeyValuePair<string, string>[] { new("DisableSeed", "true") }
-                        );
-                    }
-                );
                 builder.ConfigureServices(
                     services =>
                     {

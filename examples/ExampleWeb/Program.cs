@@ -15,10 +15,13 @@ builder.Services.AddDbContext<ExampleDbContext>(
 
 var app = builder.Build();
 
-await app.Services
-    .CreateScope()
-    .ServiceProvider.GetRequiredService<ExampleDbContext>()
-    .Database.MigrateAsync();
+if (app.Configuration.GetValue<bool>("DisableSeed") != true)
+{
+    await app.Services
+        .CreateScope()
+        .ServiceProvider.GetRequiredService<ExampleDbContext>()
+        .Database.MigrateAsync();
+}
 
 app.MapGet("/", () => "Hello World!");
 app.MapGet(
