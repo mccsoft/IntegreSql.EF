@@ -22,3 +22,47 @@ IntegreSQL.EF allows you to use real PostgreSQL instances, and keep the timing u
 
 ## How to use it
 Check out example [IntegrationTest]() (i.e using in-memory [TestServer and doing API calls](https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-6.0))
+
+**Pre-requisite**: copy the contents of [scripts]() folder to your repo and run `docker-compose run -d` from that folder.
+This will run IntegreSQL (on port 5000) and PostgreSQL (on port 5434) docker containers. 
+
+**Important**: if you run tests as part of CI, don't forget to run the same script as part of your CI.
+
+### Integration tests
+### Unit tests
+Check out [simplified example](tests/ExampleWeb.UnitTests/UnitTestSimplified.cs).
+
+Step-by-step guide, which will show how to create a DbContext pointing to the test database:
+1. In test constructor:
+   1. Create database initializer of choice (you could use `SqliteDatabaseInitializer` if you'd like to):
+       ```csharp
+       _databaseInitializer = new NpgsqlDatabaseInitializer(
+          // This is needed if you run tests NOT inside the container.
+          // 5434 is the public port number of Postgresql instance
+          connectionStringOverride: new() { Host = "localhost", Port = 5434 }
+        )
+      ```
+   2. Create a new database to be used in test (database will be created using `dbContext.Database.EnsureCreated()` method): 
+       ```csharp
+       var connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync<ExampleDbContext>();
+      ```
+   3. Create a `DatabaseContextOptions` pointing to created database. You will later use this instance to create DbContexts.
+       ```csharp
+        _options = _databaseInitializer.CreateDbContextOptionsBuilder<ExampleDbContext>(
+            connectionString
+        ).Options;
+      ```
+      Commands from step 2 and 3 could be united in
+      ```csharp
+      _dbContextOptions = _databaseInitializer
+            .CreateDatabaseGetDbContextOptionsBuilderSync<ExampleDbContext>()
+            .Options;
+      ```
+   4. Add a method to create a `DbContext` pointing to the newly created database:
+      ```csharp
+      public ExampleDbContext CreateDbContext()
+      {
+         return new ExampleDbContext(_dbContextOptions);
+      }
+      ```
+There's also a bit more [advanced example](tests/ExampleWeb.UnitTests/UnitTestBase.cs), which allows to choose Sqlite/Postgres/No database per test.

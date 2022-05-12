@@ -21,16 +21,15 @@ public class UnitTestBase
 
     private IDatabaseInitializer? CreateDatabaseInitializer(DatabaseType? databaseType)
     {
-        // this is needed if you run tests NOT inside the container
-        NpgsqlDatabaseInitializer.ConnectionStringOverride = new ConnectionStringOverride()
-        {
-            Host = "localhost",
-            Port = 5434,
-        };
         return databaseType switch
         {
             null => null,
-            DatabaseType.Postgres => new NpgsqlDatabaseInitializer(),
+            DatabaseType.Postgres
+              => new NpgsqlDatabaseInitializer(
+                  // This is needed if you run tests NOT inside the container.
+                  // 5434 is the public port number of Postgresql instance
+                  connectionStringOverride: new() { Host = "localhost", Port = 5434 }
+              ),
             DatabaseType.Sqlite => new SqliteDatabaseInitializer(),
             _ => throw new ArgumentOutOfRangeException(nameof(databaseType), databaseType, null)
         };

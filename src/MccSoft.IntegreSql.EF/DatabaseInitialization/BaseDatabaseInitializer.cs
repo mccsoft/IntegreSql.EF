@@ -106,7 +106,7 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
 
     /// <inheritdoc cref="IDatabaseInitializer.CreateDatabaseGetDbContextOptionsBuilderSync{TDbContext}"/>
     public virtual DbContextOptionsBuilder<TDbContext> CreateDatabaseGetDbContextOptionsBuilderSync<TDbContext>(
-        BasicDatabaseSeedingOptions<TDbContext> seedingOptions
+        BasicDatabaseSeedingOptions<TDbContext> seedingOptions = null
     ) where TDbContext : DbContext
     {
         return TaskUtils.RunSynchronously(

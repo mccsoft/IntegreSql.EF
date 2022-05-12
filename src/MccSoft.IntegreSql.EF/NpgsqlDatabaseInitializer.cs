@@ -13,17 +13,16 @@ namespace MccSoft.IntegreSql.EF;
 /// </summary>
 public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 {
-    private readonly string _hashPrefix;
     private readonly IntegreSqlClient _integreSqlClient;
 
     /// <summary>
-    /// When <see cref="CreateDatabaseGetConnectionStringAdvanced"/> is called, IntegreSQL returns a connection string it uses to connect to PostgreSQL.
+    /// When <see cref="GetConnectionString"/> is called, IntegreSQL returns a connection string it uses to connect to PostgreSQL.
     /// These settings might differ from what you want to use
     /// (e.g. because IntegreSQL uses internal docker hostname/port of Postgres, and your tests are not running in docker).
     /// So you could override some connection string by defining <see cref="ConnectionStringOverride"/>
     /// and setting some properties to non-null values.
     /// </summary>
-    public static ConnectionStringOverride ConnectionStringOverride { get; set; } = new();
+    public ConnectionStringOverride ConnectionStringOverride { get; set; } = new();
 
     /// <summary>
     /// If set to true, we will MD5 the databaseHash that you provide to <see cref="CreateDatabaseGetConnectionStringAdvanced"/> before passing it to IntegreSQL.
@@ -44,12 +43,21 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     /// Constructs NpgsqlDatabaseInitializer
     /// </summary>
     /// <param name="integreSqlUri">URI of IntegreSQL. http://localhost:5000/api/v1/ is used by default</param>
-    /// <param name="hashPrefix">Prefix to add to all database hashes. Useful to e.g. differentiate databases in Unit and Integration tests.</param>
-    public NpgsqlDatabaseInitializer(Uri integreSqlUri = null, string hashPrefix = null)
+    /// <param name="connectionStringOverride">
+    /// When <see cref="GetConnectionString"/> is called, IntegreSQL returns a connection string it uses to connect to PostgreSQL.
+    /// These settings might differ from what you want to use
+    /// (e.g. because IntegreSQL uses internal docker hostname/port of Postgres, and your tests are not running in docker).
+    /// So you could override some connection string by defining <paramref name="connectionStringOverride"/>
+    /// and setting some properties to non-null values.
+    /// </param>
+    public NpgsqlDatabaseInitializer(
+        Uri integreSqlUri = null,
+        ConnectionStringOverride connectionStringOverride = null
+    )
     {
-        _hashPrefix = hashPrefix;
         integreSqlUri ??= new Uri("http://localhost:5000/api/v1/");
         _integreSqlClient = new IntegreSqlClient(integreSqlUri);
+        ConnectionStringOverride = connectionStringOverride;
     }
 
     /// <summary>
