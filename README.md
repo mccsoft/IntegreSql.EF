@@ -35,8 +35,6 @@ IntegreSQL.EF allows you to use real PostgreSQL instances, and keep the timing u
 the [IntegreSQL](https://github.com/allaboutapps/integresql) project).
 
 ## How to use it
-
-Check out example [IntegrationTest]() (i.e using
 in-memory [TestServer and doing API calls](https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-6.0))
 
 **Pre-requisite**: copy the contents of [scripts]() folder to your repo and run `docker-compose run -d` from that
@@ -153,4 +151,30 @@ Check out [full simplified example](tests/ExampleWeb.IntegrationTests/Integratio
 ```
 There's a bit more [advanced example](tests/ExampleWeb.IntegrationTests/IntegrationTestBase.cs) here as well.
 
-# Advanced API
+# API
+### NpgsqlDatabaseInitializer
+This is the main entry point to do database caching.
+#### .CreateDatabaseGetConnectionString
+Creates a template database (if not created before) using `DbContext.Database.EnsureCreated`.
+Accepts a `databaseSeedingOptions` parameter, which allows to configure some additional seeding (beside standard `EnsureCreated`).
+
+Then it creates a copy of template database to be used in each test.
+Returns a connection string for passed DbContext to be used in the test.
+
+Normally you should run this function once per test.
+
+#### .CreateDatabaseGetDbContextOptionsBuilder
+Creates the database using [CreateDatabaseGetConnectionString](#.CreateDatabaseGetConnectionString) and returns a DbContextOptionsBuilder for the created database.
+
+Returned `DbContextOptions` are meant to be stored in a Test Class field and used to create a DbContext instance (pointing to the same DB during the test).
+
+This is a simple helper method so you don't have to create `DbContextOptions` by hand.
+
+#### .ReturnDatabaseToPool
+Returns test database to a pool (which allows consequent tests to reuse this database).
+
+Note that you need to clean up database by yourself before returning it to the pool!
+If you return a dirty database, consequent tests might fail!
+
+If you don't want to clean it up, just don't use this function.
+Dirty databases are automatically deleted by IntegreSQL once database number exceeds a certain limit (500 by default).
