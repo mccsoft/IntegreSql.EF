@@ -16,7 +16,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     private readonly IntegreSqlClient _integreSqlClient;
 
     /// <summary>
-    /// When <see cref="NpgsqlDatabaseInitializer.GetConnectionString"/> is called, IntegreSQL returns a connection string it uses to connect to PostgreSQL.
+    /// When <see cref="CreateDatabaseGetConnectionStringAdvanced"/> is called, IntegreSQL returns a connection string it uses to connect to PostgreSQL.
     /// These settings might differ from what you want to use
     /// (e.g. because IntegreSQL uses internal docker hostname/port of Postgres, and your tests are not running in docker).
     /// So you could override some connection string by defining <see cref="ConnectionStringOverride"/>
@@ -25,7 +25,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     public static ConnectionStringOverride ConnectionStringOverride { get; set; } = new();
 
     /// <summary>
-    /// If set to true, we will MD5 the databaseHash that you provide to <see cref="GetConnectionString"/> before passing it to IntegreSQL.
+    /// If set to true, we will MD5 the databaseHash that you provide to <see cref="CreateDatabaseGetConnectionStringAdvanced"/> before passing it to IntegreSQL.
     /// If false, we will pass databaseHash as is.
     /// Note, that if `false` is used, there's a 30 symbols length limit for databaseHash.
     /// </summary>
@@ -70,7 +70,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     /// Receives PostgreSQL connection string.
     /// </param>
     /// <returns>Connection string to a copy of initialized database to be used in tests</returns>
-    public override async Task<string> GetConnectionString(
+    public override async Task<string> CreateDatabaseGetConnectionStringAdvanced(
         string databaseHash,
         Func<string, Task> initializeDatabase
     )
@@ -129,7 +129,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     /// If you don't want to clean it up, just don't use this function.
     /// Dirty databases are automatically deleted by IntegreSQL once database number exceeds a certain limit (500 by default).
     /// </summary>
-    public override async Task ReturnDatabase(string connectionString)
+    public override async Task ReturnDatabaseToPool(string connectionString)
     {
         var connectionStringInfo = ConnectionStringInfos[connectionString];
 

@@ -23,7 +23,7 @@ public class SqliteDatabaseInitializer : BaseDatabaseInitializer
     private static readonly LazyConcurrentDictionary<string, Task> InitializationTasks = new();
 
     /// <summary>
-    /// If set to true, we will MD5 the databaseHash that you provide to <see cref="GetConnectionString"/> before converting it to Sqlite filename.
+    /// If set to true, we will MD5 the databaseHash that you provide to <see cref="CreateDatabaseGetConnectionStringAdvanced"/> before converting it to Sqlite filename.
     /// If false, we will use databaseHash as is.
     /// Note, that if `false` is used, there's a 200 symbols length limit for databaseHash.
     /// </summary>
@@ -33,7 +33,7 @@ public class SqliteDatabaseInitializer : BaseDatabaseInitializer
 
     private readonly List<string> _testDatabaseFilenames = new();
 
-    public override async Task<string> GetConnectionString(
+    public override async Task<string> CreateDatabaseGetConnectionStringAdvanced(
         string databaseHash,
         Func<string, Task> initializeDatabase
     )
@@ -68,7 +68,7 @@ public class SqliteDatabaseInitializer : BaseDatabaseInitializer
     /// <summary>
     /// Returns test database to a pool
     /// </summary>
-    public override Task ReturnDatabase(string connectionString)
+    public override Task ReturnDatabaseToPool(string connectionString)
     {
         File.Delete(connectionString);
         return Task.CompletedTask;

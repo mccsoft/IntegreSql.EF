@@ -7,38 +7,98 @@ namespace MccSoft.IntegreSql.EF.DatabaseInitialization;
 public interface IDatabaseInitializer : IDisposable, IUseProvider
 {
     /// <summary>
-    /// Returns a connection string to be used in the test.
-    /// Under the cover it creates a template database (using <paramref name="initializeDatabase"/> function)
-    /// and then create a copy of it to be used in each test.
+    /// Creates a template database (if not created before) and seeds the data by
+    /// running a <paramref name="initializeDatabase"/> function (which receives connection string).
+    /// Then it creates a copy of template database to be used in each test
+    /// and returns a connection string to be used in the test.
+    /// Normally you should run this function once per test.
     /// </summary>
     /// <param name="databaseHash">Hash that uniquely identifies your database structure + seed data</param>
     /// <param name="initializeDatabase">
     /// Function that should create DB schema and seed the data.
     /// Receives a connection string.
     /// </param>
-    /// <returns></returns>
-    Task<string> GetConnectionString(string databaseHash, Func<string, Task> initializeDatabase);
+    /// <returns>Connection string to a copy of template database</returns>
+    Task<string> CreateDatabaseGetConnectionStringAdvanced(
+        string databaseHash,
+        Func<string, Task> initializeDatabase
+    );
 
     /// <summary>
-    /// Returns a connection string for passed DbContext to be used in the test.
-    /// Under the cover it creates a template database using DbContext.Database.EnsureCreated and
+    /// Creates a template database (if not created before) and seeds the data by
+    /// running a <paramref name="initializeDatabase"/> function (which receives connection string).
+    /// Then it creates a copy of template database to be used in each test
+    /// and returns a connection string to be used in the test.
+    /// Normally you should run this function once per test.
+    /// </summary>
+    /// <param name="databaseHash">Hash that uniquely identifies your database structure + seed data</param>
+    /// <param name="initializeDatabase">
+    /// Function that should create DB schema and seed the data.
+    /// Receives a connection string.
+    /// </param>
+    /// <returns>Connection string to a copy of template database</returns>
+    string CreateDatabaseGetConnectionStringAdvancedSync(
+        string databaseHash,
+        Func<string, Task> initializeDatabase
+    );
+
+    /// <summary>
+    /// Creates a template database (if not created before) using DbContext.Database.EnsureCreated and
     /// runs a <paramref name="databaseSeeding"/> on it.
     /// Then it creates a copy of template database to be used in each test.
+    /// Returns a connection string for passed DbContext to be used in the test.
+    /// Normally you should run this function once per test.
     /// </summary>
-    /// <typeparam name="TDbContext">
-    /// DbContext that is used to create a template database (by running DbContext.Database.EnsureCreated()
-    /// </typeparam>
-    Task<string> GetConnectionStringUsingEnsureCreated<TDbContext>(
-        BasicDatabaseSeedingOptions<TDbContext> databaseSeeding
+    /// <returns>Connection string to a copy of template database</returns>
+    Task<string> CreateDatabaseGetConnectionString<TDbContext>(
+        BasicDatabaseSeedingOptions<TDbContext> databaseSeeding = null
     ) where TDbContext : DbContext;
 
     /// <summary>
-    /// Returns test database to a pool
+    /// Creates a template database (if not created before) using DbContext.Database.EnsureCreated and
+    /// runs a <paramref name="databaseSeeding"/> on it.
+    /// Then it creates a copy of template database to be used in each test.
+    /// Returns a connection string for passed DbContext to be used in the test.
+    /// Normally you should run this function once per test.
     /// </summary>
-    Task ReturnDatabase(string connectionString);
+    /// <returns>Connection string to a copy of template database</returns>
+    string CreateDatabaseGetConnectionStringSync<TDbContext>(
+        BasicDatabaseSeedingOptions<TDbContext> databaseSeeding = null
+    ) where TDbContext : DbContext;
 
     /// <summary>
-    /// Creates connectionString using <see cref="GetConnectionStringUsingEnsureCreated"/>.
+    /// Creates the DbContextOptionsBuilder for passed connection string.
+    /// Should be stored in a Test Class field and used to create a DbContext instance (pointing to the same DB during the test).
+    /// </summary>
+    DbContextOptionsBuilder<TDbContext> CreateDbContextOptionsBuilder<TDbContext>(
+        string connectionString
+    ) where TDbContext : DbContext;
+
+    /// <summary>
+    /// Creates the database using <see cref="CreateDatabaseGetConnectionString{TDbContext}"/>
+    /// and returns a DbContextOptionsBuilder for the created database.
+    /// Should be stored in a Test Class field and used to create a DbContext instance (pointing to the same DB during the test).
+    /// </summary>
+    Task<DbContextOptionsBuilder<TDbContext>> CreateDatabaseGetDbContextOptionsBuilder<TDbContext>(
+        BasicDatabaseSeedingOptions<TDbContext> seedingOptions = null
+    ) where TDbContext : DbContext;
+
+    /// <summary>
+    /// Creates the database using <see cref="CreateDatabaseGetConnectionString{TDbContext}"/>
+    /// and returns a DbContextOptionsBuilder for the created database.
+    /// Should be stored in a Test Class field and used to create a DbContext instance (pointing to the same DB during the test).
+    /// </summary>
+    DbContextOptionsBuilder<TDbContext> CreateDatabaseGetDbContextOptionsBuilderSync<TDbContext>(
+        BasicDatabaseSeedingOptions<TDbContext> seedingOptions = null
+    ) where TDbContext : DbContext;
+
+    /// <summary>
+    /// Returns test database to a pool.
+    /// </summary>
+    Task ReturnDatabaseToPool(string connectionString);
+
+    /// <summary>
+    /// Creates connectionString using <see cref="CreateDatabaseGetConnectionString{TDbContext}"/>.
     /// Calls options.UseNpgsql() or options.UseSqlite() depending on database provider initializer works with.
     /// Helps build the common WebApplicationFactory creation code which only requires IDatabaseInitializer
     /// </summary>
