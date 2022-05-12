@@ -61,7 +61,11 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
                     connectionString: connectionString,
                     factoryMethod: databaseSeeding?.DbContextFactory
                 );
-                dbContext.Database.EnsureCreated();
+                if (databaseSeeding?.DisableEnsureCreated != true)
+                {
+                    dbContext.Database.EnsureCreated();
+                }
+
                 PerformBasicSeedingOperations(dbContext);
 
                 await (databaseSeeding?.SeedingFunction?.Invoke(dbContext) ?? Task.CompletedTask);

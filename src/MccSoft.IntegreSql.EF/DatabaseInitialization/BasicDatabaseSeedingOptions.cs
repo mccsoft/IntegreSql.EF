@@ -6,6 +6,7 @@ namespace MccSoft.IntegreSql.EF.DatabaseInitialization;
 
 public record BasicDatabaseSeedingOptions<TDbContext>(
     string Name,
-    Func<TDbContext, Task> SeedingFunction,
-    Func<DbContextOptions<TDbContext>, TDbContext>? DbContextFactory = null
+    Func<TDbContext, Task>? SeedingFunction = null,
+    Func<DbContextOptions<TDbContext>, TDbContext>? DbContextFactory = null,
+    bool DisableEnsureCreated = false
 ) where TDbContext : DbContext;

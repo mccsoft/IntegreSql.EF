@@ -13,6 +13,7 @@ namespace MccSoft.IntegreSql.EF;
 /// </summary>
 public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 {
+    private readonly string _hashPrefix;
     private readonly IntegreSqlClient _integreSqlClient;
 
     /// <summary>
@@ -43,8 +44,10 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     /// Constructs NpgsqlDatabaseInitializer
     /// </summary>
     /// <param name="integreSqlUri">URI of IntegreSQL. http://localhost:5000/api/v1/ is used by default</param>
-    public NpgsqlDatabaseInitializer(Uri integreSqlUri = null)
+    /// <param name="hashPrefix">Prefix to add to all database hashes. Useful to e.g. differentiate databases in Unit and Integration tests.</param>
+    public NpgsqlDatabaseInitializer(Uri integreSqlUri = null, string hashPrefix = null)
     {
+        _hashPrefix = hashPrefix;
         integreSqlUri ??= new Uri("http://localhost:5000/api/v1/");
         _integreSqlClient = new IntegreSqlClient(integreSqlUri);
     }
