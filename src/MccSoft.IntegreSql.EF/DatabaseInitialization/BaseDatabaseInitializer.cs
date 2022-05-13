@@ -27,6 +27,12 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     /// <inheritdoc cref="IDatabaseInitializer.ReturnDatabaseToPool"/>
     public abstract Task ReturnDatabaseToPool(string connectionString);
 
+    /// <inheritdoc cref="IDatabaseInitializer.ReturnDatabaseToPool"/>
+    public virtual void ReturnDatabaseToPoolSync(string connectionString)
+    {
+        TaskUtils.RunSynchronously(() => ReturnDatabaseToPool(connectionString));
+    }
+
     /// <inheritdoc cref="IDatabaseInitializer.UseProvider"/>
     public abstract void UseProvider(DbContextOptionsBuilder options, string connectionString);
 

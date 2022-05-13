@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
@@ -60,6 +60,11 @@ public interface IDatabaseInitializer : IDisposable, IUseProvider
     /// Returns test database to a pool.
     /// </summary>
     Task ReturnDatabaseToPool(string connectionString);
+
+    /// <summary>
+    /// Returns test database to a pool.
+    /// </summary>
+    void ReturnDatabaseToPoolSync(string connectionString);
 
     /// <summary>
     /// Creates connectionString using <see cref="CreateDatabaseGetConnectionString{TDbContext}"/>.
