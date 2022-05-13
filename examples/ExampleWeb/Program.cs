@@ -42,6 +42,16 @@ app.MapGet(
     async (ExampleDbContext dbContext) =>
         await dbContext.Users.Select(x => new { x.Id, x.Name }).ToListAsync()
 );
+app.MapPost(
+    "/users",
+    async (context) =>
+    {
+        var user = await context.Request.ReadFromJsonAsync<User>();
+        var dbContext = context.RequestServices.GetRequiredService<ExampleDbContext>();
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+    }
+);
 app.MapGet("/users-from-service", async (UserService userService) => await userService.GetUsers());
 
 app.Run();

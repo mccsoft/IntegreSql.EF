@@ -178,3 +178,12 @@ If you return a dirty database, consequent tests might fail!
 
 If you don't want to clean it up, just don't use this function.
 Dirty databases are automatically deleted by IntegreSQL once database number exceeds a certain limit (500 by default).
+
+
+# Advanced
+Sometimes in Integration tests you might want to setup a template database by doing API calls. In other words, you need the full-blown `TestServer` and `TestClient` to do the seeding.
+Though, it's not recommended per se (as it's a bit complicated and slower than seeding via DbContext directly), there are perfectly reasonable scenarios for this case.
+
+This library supports that and you could check out [an example](tests/ExampleWeb.IntegrationTests/IntegrationTestAdvancedSeedingExample.cs) doing just that.
+
+P.S. The example is intentionally simplified and could be easily converted to DbContext-based seeding, and serves the demonstration purposes only.
