@@ -37,7 +37,7 @@ the [IntegreSQL](https://github.com/allaboutapps/integresql) project).
 ## How to use it
 in-memory [TestServer and doing API calls](https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-6.0))
 
-**Pre-requisite**: copy the contents of [scripts]() folder to your repo and run `docker-compose run -d` from that
+**Pre-requisite**: copy the contents of [scripts](scripts) folder to your repo and run `docker-compose run -d` from that
 folder.
 This will run IntegreSQL (on port 5000) and PostgreSQL (on port 5434) docker containers.
 
@@ -81,7 +81,7 @@ Here's a step-by-step guide, which will show how to create a DbContext pointing 
        ```
     4. Add a method to create a `DbContext` pointing to the newly created database:
        ```csharp
-       public ExampleDbContext CreateDbContext()
+       public ExampleDbContext CreateDbContext 
        {
           return new ExampleDbContext(_dbContextOptions);
        }
