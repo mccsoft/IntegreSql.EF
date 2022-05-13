@@ -29,7 +29,7 @@ public class IntegrationTestSimplified
 
         // Create template database (using EnsureCreated()) and a copy of it to be used in the test
         var connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync(
-            new BasicDatabaseSeedingOptions<ExampleDbContext>(Name: "Integration")
+            new DatabaseSeedingOptions<ExampleDbContext>(Name: "Integration")
         );
 
         // Create a standard WebApplicationFactory to set up web app in tests
@@ -76,7 +76,9 @@ public class IntegrationTestSimplified
     [Theory]
     [InlineData(1)]
     [InlineData(2)]
+#pragma warning disable xUnit1026
     public async Task Test(int iteration)
+#pragma warning restore xUnit1026
     {
         var result = await _httpClient.GetFromJsonAsync<List<string>>("/users-from-service");
         Assert.Equal(new string[] { "John", "Bill", }, result);

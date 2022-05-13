@@ -27,7 +27,9 @@ public class PostgresWithoutEnsureCreatedTests : IntegrationTestBaseWithoutEnsur
     [InlineData(2)]
     [InlineData(3)]
     [InlineData(4)]
+#pragma warning disable xUnit1026
     public async Task Test1(int iteration)
+#pragma warning restore xUnit1026
     {
         var result = await _httpClient.GetFromJsonAsync<List<UserDto>>("/users");
         Assert.Equal(
@@ -45,7 +47,9 @@ public class PostgresWithoutEnsureCreatedTests : IntegrationTestBaseWithoutEnsur
     [InlineData(2)]
     [InlineData(3)]
     [InlineData(4)]
+#pragma warning disable xUnit1026
     public async Task Test2(int iteration)
+#pragma warning restore xUnit1026
     {
         var result = await _httpClient.GetFromJsonAsync<List<string>>("/users-from-service");
         Assert.Equal(new string[] { "John", "Bill", }, result);

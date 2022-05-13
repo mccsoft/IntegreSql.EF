@@ -22,7 +22,9 @@ public class PostgresTests : UnitTestBase
     [InlineData(2)]
     [InlineData(3)]
     [InlineData(4)]
+#pragma warning disable xUnit1026
     public async Task Test1(int iteration)
+#pragma warning restore xUnit1026
     {
         var users = await _service.GetUsers();
         Assert.Equal(new[] { "John", "Bill" }, users);

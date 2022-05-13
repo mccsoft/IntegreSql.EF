@@ -18,7 +18,7 @@ public class IntegrationTestBaseWithoutEnsureCreated
     {
         _databaseInitializer = CreateDatabaseInitializer(databaseType);
         var connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync(
-            new BasicDatabaseSeedingOptions<ExampleDbContext>(
+            new DatabaseSeedingOptions<ExampleDbContext>(
                 Name: "IntegrationWithoutEnsureCreated",
                 DisableEnsureCreated: true
             )

@@ -25,7 +25,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     public ConnectionStringOverride ConnectionStringOverride { get; set; } = new();
 
     /// <summary>
-    /// If set to true, we will MD5 the databaseHash that you provide to <see cref="CreateDatabaseGetConnectionStringAdvanced"/> before passing it to IntegreSQL.
+    /// If set to true, we will MD5 the databaseHash that you provide to <see cref="CreateDatabaseGetConnectionStringInternal"/> before passing it to IntegreSQL.
     /// If false, we will pass databaseHash as is.
     /// Note, that if `false` is used, there's a 30 symbols length limit for databaseHash.
     /// </summary>
@@ -81,7 +81,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     /// Receives PostgreSQL connection string.
     /// </param>
     /// <returns>Connection string to a copy of initialized database to be used in tests</returns>
-    public override async Task<string> CreateDatabaseGetConnectionStringAdvanced(
+    protected override async Task<string> CreateDatabaseGetConnectionStringInternal(
         string databaseHash,
         Func<string, Task> initializeDatabase
     )

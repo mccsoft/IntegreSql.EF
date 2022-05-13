@@ -20,7 +20,7 @@ public class IntegrationTestBase
     {
         _databaseInitializer = CreateDatabaseInitializer(databaseType);
         var connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync(
-            new BasicDatabaseSeedingOptions<ExampleDbContext>(Name: "Integration")
+            new DatabaseSeedingOptions<ExampleDbContext>(Name: "Integration")
         );
 
         var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(
