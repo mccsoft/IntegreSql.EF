@@ -29,10 +29,11 @@ jobs:
       run: cd scripts; docker-compose up -d
       
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
 
     - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v1
+      uses: dorny/test-reporter@v1
       if: always()
       with:
-        files: "test-results/**/*.xml"
+        path: "test-results.trx"
+        reporter: dotnet-trx
