@@ -33,6 +33,15 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
         TaskUtils.RunSynchronously(() => ReturnDatabaseToPool(connectionString));
     }
 
+    /// <inheritdoc cref="IDatabaseInitializer.RemoveDatabase"/>
+    public abstract Task RemoveDatabase(string connectionString);
+
+    /// <inheritdoc cref="IDatabaseInitializer.RemoveDatabaseSync"/>
+    public virtual void RemoveDatabaseSync(string connectionString)
+    {
+        TaskUtils.RunSynchronously(() => RemoveDatabase(connectionString));
+    }
+
     /// <inheritdoc cref="IDatabaseInitializer.UseProvider"/>
     public abstract void UseProvider(DbContextOptionsBuilder options, string connectionString);
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -13,10 +14,11 @@ using Xunit;
 
 namespace ExampleWeb;
 
-public class IntegrationTestSimplified
+public class IntegrationTestSimplified : IDisposable
 {
     protected readonly HttpClient _httpClient;
     private readonly IDatabaseInitializer _databaseInitializer;
+    private readonly string _connectionString;
 
     public IntegrationTestSimplified()
     {
@@ -28,7 +30,7 @@ public class IntegrationTestSimplified
         );
 
         // Create template database (using EnsureCreated()) and a copy of it to be used in the test
-        var connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync(
+        _connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync(
             new DatabaseSeedingOptions<ExampleDbContext>(Name: "Integration")
         );
 
@@ -58,7 +60,7 @@ public class IntegrationTestSimplified
 
                         // Add new DbContext registration
                         services.AddDbContext<ExampleDbContext>(
-                            options => _databaseInitializer.UseProvider(options, connectionString)
+                            options => _databaseInitializer.UseProvider(options, _connectionString)
                         );
                     }
                 );
@@ -82,5 +84,10 @@ public class IntegrationTestSimplified
     {
         var result = await _httpClient.GetFromJsonAsync<List<string>>("/users-from-service");
         Assert.Equal(new string[] { "John", "Bill", }, result);
+    }
+
+    public void Dispose()
+    {
+        _databaseInitializer?.RemoveDatabase(_connectionString);
     }
 }

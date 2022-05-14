@@ -13,10 +13,11 @@ using Xunit;
 
 namespace ExampleWeb;
 
-public class IntegrationTestAdvancedSeedingExample
+public class IntegrationTestAdvancedSeedingExample : IDisposable
 {
-    protected HttpClient _httpClient;
+    protected HttpClient _httpClient = null!;
     private readonly IDatabaseInitializer _databaseInitializer;
+    private readonly string _connectionString;
 
     public IntegrationTestAdvancedSeedingExample()
     {
@@ -25,19 +26,19 @@ public class IntegrationTestAdvancedSeedingExample
             // 5434 is the public port number of Postgresql instance
             connectionStringOverride: new() { Host = "localhost", Port = 5434 }
         );
-        var connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync(
+        _connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync(
             new DatabaseSeedingOptions<ExampleDbContext>(
                 Name: nameof(IntegrationTestAdvancedSeedingExample),
                 SeedingFunction: async (dbContext) =>
                 {
-                    CreateWebApplicationFactory(dbContext.Database.GetConnectionString()!);
+                    CreateWebApplication(dbContext.Database.GetConnectionString()!);
                     await SeedData();
                 },
                 DisableEnsureCreated: true
             )
         );
 
-        CreateWebApplicationFactory(connectionString);
+        CreateWebApplication(_connectionString);
     }
 
     private async Task SeedData()
@@ -45,7 +46,7 @@ public class IntegrationTestAdvancedSeedingExample
         await _httpClient.PostAsJsonAsync("/users", new { Name = "qwe" });
     }
 
-    private WebApplicationFactory<Program> CreateWebApplicationFactory(string connectionString)
+    private WebApplicationFactory<Program> CreateWebApplication(string connectionString)
     {
         var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(
             builder =>
@@ -75,5 +76,10 @@ public class IntegrationTestAdvancedSeedingExample
     {
         var result = await _httpClient.GetFromJsonAsync<List<string>>("/users-from-service");
         Assert.Equal(new string[] { "John", "Bill", "qwe" }, result);
+    }
+
+    public void Dispose()
+    {
+        _databaseInitializer?.RemoveDatabase(_connectionString);
     }
 }

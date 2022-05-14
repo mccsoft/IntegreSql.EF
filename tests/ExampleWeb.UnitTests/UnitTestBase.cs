@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExampleWeb.UnitTests;
 
-public class UnitTestBase
+public class UnitTestBase : IDisposable
 {
     private readonly IDatabaseInitializer? _databaseInitializer;
     private readonly DbContextOptions<ExampleDbContext>? _dbContextOptions;
@@ -40,5 +40,10 @@ public class UnitTestBase
         if (_dbContextOptions == null)
             return null!;
         return new ExampleDbContext(_dbContextOptions);
+    }
+
+    public void Dispose()
+    {
+        _databaseInitializer?.RemoveDatabase(CreateDbContext().Database.GetConnectionString());
     }
 }

@@ -9,15 +9,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ExampleWeb;
 
-public class IntegrationTestBaseWithoutEnsureCreated
+public class IntegrationTestBaseWithoutEnsureCreated : IDisposable
 {
     protected readonly HttpClient _httpClient;
     private readonly IDatabaseInitializer _databaseInitializer;
+    private readonly string _connectionString;
 
     protected IntegrationTestBaseWithoutEnsureCreated(DatabaseType databaseType)
     {
         _databaseInitializer = CreateDatabaseInitializer(databaseType);
-        var connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync(
+        _connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync(
             new DatabaseSeedingOptions<ExampleDbContext>(
                 Name: "IntegrationWithoutEnsureCreated",
                 DisableEnsureCreated: true
@@ -36,7 +37,7 @@ public class IntegrationTestBaseWithoutEnsureCreated
                         services.Remove(descriptor);
 
                         services.AddDbContext<ExampleDbContext>(
-                            options => _databaseInitializer.UseProvider(options, connectionString)
+                            options => _databaseInitializer.UseProvider(options, _connectionString)
                         );
                     }
                 );
@@ -59,5 +60,10 @@ public class IntegrationTestBaseWithoutEnsureCreated
             DatabaseType.Sqlite => new SqliteDatabaseInitializer(),
             _ => throw new ArgumentOutOfRangeException(nameof(databaseType), databaseType, null)
         };
+    }
+
+    public void Dispose()
+    {
+        _databaseInitializer?.RemoveDatabase(_connectionString);
     }
 }

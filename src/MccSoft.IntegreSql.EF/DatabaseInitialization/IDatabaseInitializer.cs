@@ -63,8 +63,19 @@ public interface IDatabaseInitializer : IDisposable, IUseProvider
 
     /// <summary>
     /// Returns test database to a pool.
+    /// You need to cleanup the data in that database yourself!
     /// </summary>
     void ReturnDatabaseToPoolSync(string connectionString);
+
+    /// <summary>
+    /// Removes test database.
+    /// </summary>
+    Task RemoveDatabase(string connectionString);
+
+    /// <summary>
+    /// Removes test database.
+    /// </summary>
+    void RemoveDatabaseSync(string connectionString);
 
     /// <summary>
     /// Creates connectionString using <see cref="CreateDatabaseGetConnectionString{TDbContext}"/>.

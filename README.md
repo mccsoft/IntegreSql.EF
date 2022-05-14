@@ -176,9 +176,15 @@ Returns test database to a pool (which allows consequent tests to reuse this dat
 Note that you need to clean up database by yourself before returning it to the pool!
 If you return a dirty database, consequent tests might fail!
 
-If you don't want to clean it up, just don't use this function.
+If you don't want to clean it up, just don't use this function (or use `RemoveDatabase` instead).
 Dirty databases are automatically deleted by IntegreSQL once database number exceeds a certain limit (500 by default).
 
+#### .RemoveDatabase
+Removes the test database.
+
+You could do this in `Dispose` method of your test if you don't want to have postgresql databases just hanging around.
+
+However, this is completely optional, and test databases will be deleted by IntegreSQL itself (when there's more than 500 databases).   
 
 # Advanced
 Sometimes in Integration tests you might want to setup a template database by doing API calls. In other words, you need the full-blown `TestServer` and `TestClient` to do the seeding.

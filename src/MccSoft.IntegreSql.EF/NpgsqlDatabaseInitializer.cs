@@ -150,6 +150,16 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
         );
     }
 
+    public override async Task RemoveDatabase(string connectionString)
+    {
+        await using var connection = new NpgsqlConnection(connectionString);
+        var database = connection.Database;
+        await connection.OpenAsync();
+        connection.ChangeDatabase("postgresql");
+        var command = new NpgsqlCommand($"DROP DATABASE {database}", connection);
+        await command.ExecuteNonQueryAsync();
+    }
+
     public override void UseProvider(DbContextOptionsBuilder options, string connectionString)
     {
         options.UseNpgsql(connectionString);

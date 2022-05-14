@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using MccSoft.IntegreSql.EF.DatabaseInitialization;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace MccSoft.IntegreSql.EF;
@@ -31,8 +31,6 @@ public class SqliteDatabaseInitializer : BaseDatabaseInitializer
 
     public static bool DeleteDatabaseFilesWhenDisposed = true;
 
-    private readonly List<string> _testDatabaseFilenames = new();
-
     protected override async Task<string> CreateDatabaseGetConnectionStringInternal(
         string databaseHash,
         Func<string, Task> initializeDatabase
@@ -60,17 +58,19 @@ public class SqliteDatabaseInitializer : BaseDatabaseInitializer
         var databaseFileName = $"test-{Guid.NewGuid()}.sqlite";
         File.Copy(templateDatabaseName, databaseFileName);
 
-        _testDatabaseFilenames.Add(databaseFileName);
-
         return GetConnectionString(databaseFileName);
     }
 
-    /// <summary>
-    /// Returns test database to a pool
-    /// </summary>
-    public override Task ReturnDatabaseToPool(string connectionString)
+    public override async Task ReturnDatabaseToPool(string connectionString)
     {
-        File.Delete(connectionString);
+        await RemoveDatabase(connectionString);
+    }
+
+    public override Task RemoveDatabase(string connectionString)
+    {
+        using var sqliteConnection = new SqliteConnection(connectionString);
+
+        File.Delete(sqliteConnection.DataSource!);
         return Task.CompletedTask;
     }
 
@@ -89,14 +89,5 @@ public class SqliteDatabaseInitializer : BaseDatabaseInitializer
     protected override void PerformBasicSeedingOperations(DbContext dbContext)
     {
         dbContext.Database.OpenConnection();
-    }
-
-    public override void Dispose()
-    {
-        base.Dispose();
-        if (DeleteDatabaseFilesWhenDisposed)
-        {
-            _testDatabaseFilenames.ForEach(x => File.Delete(x));
-        }
     }
 }
