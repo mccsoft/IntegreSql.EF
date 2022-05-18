@@ -51,7 +51,15 @@ public class SqliteDatabaseInitializer : BaseDatabaseInitializer
                 }
 
                 string connectionString = GetConnectionString(templateDatabaseName);
-                await initializeDatabase(connectionString);
+                try
+                {
+                    await initializeDatabase(connectionString);
+                }
+                catch (Exception e)
+                {
+                    await RemoveDatabase(connectionString);
+                    throw;
+                }
             }
         );
 
@@ -89,5 +97,10 @@ public class SqliteDatabaseInitializer : BaseDatabaseInitializer
     protected override void PerformBasicSeedingOperations(DbContext dbContext)
     {
         dbContext.Database.OpenConnection();
+    }
+
+    internal static void ClearInitializationTasks()
+    {
+        InitializationTasks.Clear();
     }
 }

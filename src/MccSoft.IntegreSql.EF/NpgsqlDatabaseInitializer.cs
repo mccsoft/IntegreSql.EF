@@ -60,13 +60,18 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
         ConnectionStringOverride = connectionStringOverride;
     }
 
+    static NpgsqlDatabaseInitializer()
+    {
+        InitializationTasks = new();
+    }
+
     /// <summary>
     /// Stores the database initialization tasks.
     /// This is to prevent two parallel initializations of database with the same hash
     /// (if 2 tests starts in parallel).
     /// Key of dictionary is database hash, value - a Task which completes when database initialization is complete.
     /// </summary>
-    private static readonly LazyConcurrentDictionary<string, Task> InitializationTasks = new();
+    private static readonly LazyConcurrentDictionary<string, Task> InitializationTasks;
 
     /// <summary>
     /// Returns a PostgreSQL connection string to be used in the test.
@@ -189,5 +194,10 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
         ConnectionStringInfos.TryAdd(connectionString, new ConnectionStringInfo(hash, id));
 
         return connectionString;
+    }
+
+    internal static void ClearInitializationTasks()
+    {
+        InitializationTasks.Clear();
     }
 }

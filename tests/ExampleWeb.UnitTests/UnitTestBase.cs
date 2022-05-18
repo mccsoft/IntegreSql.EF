@@ -7,15 +7,20 @@ namespace ExampleWeb.UnitTests;
 
 public class UnitTestBase : IDisposable
 {
-    private readonly IDatabaseInitializer? _databaseInitializer;
-    private readonly DbContextOptions<ExampleDbContext>? _dbContextOptions;
+    protected readonly IDatabaseInitializer? _databaseInitializer;
+    private DbContextOptions<ExampleDbContext>? _dbContextOptions;
 
-    public UnitTestBase(DatabaseType? databaseType)
+    public UnitTestBase(
+        DatabaseType? databaseType,
+        DatabaseSeedingOptions<ExampleDbContext>? seedingOptions = null
+    )
     {
         _databaseInitializer = CreateDatabaseInitializer(databaseType);
 
         _dbContextOptions = _databaseInitializer
-            ?.CreateDatabaseGetDbContextOptionsBuilderSync<ExampleDbContext>()
+            ?.CreateDatabaseGetDbContextOptionsBuilderSync<ExampleDbContext>(
+                seedingOptions: seedingOptions
+            )
             ?.Options;
     }
 

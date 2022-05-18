@@ -21,4 +21,9 @@ public class LazyConcurrentDictionary<TKey, TValue>
 
         return lazyResult.Value;
     }
+
+    public void Clear()
+    {
+        _concurrentDictionary.Clear();
+    }
 }
