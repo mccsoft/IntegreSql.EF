@@ -35,11 +35,7 @@ IntegreSQL.EF allows you to use real PostgreSQL instances, and keep the timing u
 the [IntegreSQL](https://github.com/allaboutapps/integresql) project).
 
 ## How to use it
-in-memory [TestServer and doing API calls](https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-6.0))
-
-**Pre-requisite**: copy the contents of [scripts](scripts) folder to your repo and run `docker-compose run -d` from that
-folder.
-This will run IntegreSQL (on port 5000) and PostgreSQL (on port 5434) docker containers.
+**Pre-requisite**: Run [scripts/run-compose.bat](scripts/run-compose.bat). It will run IntegreSQL (on port 5000) and PostgreSQL (on port 5434) docker containers.
 
 **Important**: if you run tests as part of CI, don't forget to run the same script as part of your CI.
 
