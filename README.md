@@ -9,7 +9,7 @@ Provides an infrastructure to easily write **FAST** integration and unit tests u
 Powered by the greatest [IntegreSQL](https://github.com/allaboutapps/integresql#integresql).
 
 ## TL/DR
-Use [IntegreSqlClient](src/MccSoft.IntegreSql.EF/IntegreSqlClient.cs) if you just want a strongly-typed API to IntegreSQL.
+Use `new IntegreSqlClient()` if you just want a strongly-typed API to IntegreSQL.
 
 Check out [simplified example](tests/ExampleWeb.UnitTests/UnitTestSimplified.cs) if you want to use IntegreSQL together with EntityFramework Core.
 
