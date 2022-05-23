@@ -5,8 +5,13 @@
 [![MIT](https://img.shields.io/dub/l/vibe-d.svg)](https://opensource.org/licenses/MIT)
 [![NET6](https://img.shields.io/badge/-.NET%206.0-blueviolet)](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 
-Provides an infrastructure to easily write **FAST** integration and unit tests using **REAL** databases in ASP.Net Core.
+Provides an infrastructure to easily write **FAST** integration and unit tests using **REAL** databases in ASP.Net Core using EntityFramework.
 Powered by the greatest [IntegreSQL](https://github.com/allaboutapps/integresql#integresql).
+
+## TL/DR
+Use [IntegreSqlClient](src/MccSoft.IntegreSql.EF/IntegreSqlClient.cs) if you just want a strongly-typed API to IntegreSQL.
+
+Check out [simplified example](tests/ExampleWeb.UnitTests/UnitTestSimplified.cs) if you want to use IntegreSQL together with EntityFramework Core.
 
 ## Intro
 
