@@ -11,7 +11,9 @@ Powered by the greatest [IntegreSQL](https://github.com/allaboutapps/integresql#
 ## TL/DR
 Use `new IntegreSqlClient()` if you just want a strongly-typed API to IntegreSQL.
 
-Check out [simplified example](tests/ExampleWeb.UnitTests/UnitTestSimplified.cs) if you want to use IntegreSQL together with EntityFramework Core.
+Check out [simplified example](tests/ExampleWeb.UnitTests/UnitTestSimplified.cs) if you want to use IntegreSQL together with EntityFramework Core (or [go below](#unit-tests) for details).
+
+Don't forget to configure & run IntegreSQL instance (or execute `scripts/run-compose.bat` to start one in Docker).
 
 ## Intro
 

@@ -29,6 +29,19 @@ public class IntegreSqlClient
     }
 
     /// <summary>
+    /// Initializes IntegreSQL Client
+    /// </summary>
+    /// <param name="httpClient">
+    /// HttpClient which will be used to send requests to IntegreSQL.
+    /// Make sure it's BaseAddress is set to URI of running IntegreSQL server!
+    /// </param>
+    /// <param name="logger">Logger</param>
+    public IntegreSqlClient(HttpClient httpClient, ILogger<IntegreSqlClient> logger = null)
+    {
+        _httpClient = httpClient;
+    }
+
+    /// <summary>
     /// Returns NULL if template database is already created/is being created.
     /// </summary>
     public async Task<CreateTemplateDto> InitializeTemplate(string hash)
