@@ -46,6 +46,18 @@ the [IntegreSQL](https://github.com/allaboutapps/integresql) project).
 
 **Important**: if you run tests as part of CI, don't forget to run the same script as part of your CI.
 
+### TL/DR
+```csharp
+var databaseInitializer = new NpgsqlDatabaseInitializer(
+   connectionStringOverride: new() { Host = "localhost", Port = 5434 /* public PostgreSQL port from run-compose.bat */ }
+ );
+var dbContextOptions = databaseInitializer
+             .CreateDatabaseGetDbContextOptionsBuilderSync<ExampleDbContext>()
+             .Options;
+
+// Create DbContext and use it in tests (you could create as many DbContexts as you like using the same `dbContextOptions`).
+var dbContext = new ExampleDbContext(dbContextOptions);
+ ```
 ### Unit tests
 
 Check out [simplified example](tests/ExampleWeb.UnitTests/UnitTestSimplified.cs).
