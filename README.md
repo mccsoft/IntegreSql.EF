@@ -76,20 +76,29 @@ Here's a step-by-step guide, which will show how to create a DbContext pointing 
              connectionString
          ).Options;
        ```
-       Commands from step 2 and 3 could be united in
+       Commands from step 2 and 3 could be combined in a single call:
        ```csharp
        _dbContextOptions = _databaseInitializer
              .CreateDatabaseGetDbContextOptionsBuilderSync<ExampleDbContext>()
              .Options;
        ```
-    4. Add a method to create a `DbContext` pointing to the newly created database:
-       ```csharp
-       public ExampleDbContext CreateDbContext 
-       {
-          return new ExampleDbContext(_dbContextOptions);
-       }
-       ```
+    4. Create a database context to be used in test: ```new ExampleDbContext(_dbContextOptions)```
 
+#### Using Migrations to set up database
+If you want to use Migrations to create a test database, you could do the following
+```csharp
+var dbContextOptions = _databaseInitializer.CreateDatabaseGetDbContextOptionsBuilderSync(
+            new DatabaseSeedingOptions<ExampleDbContext>(
+                "DatabaseUsingMigrations",
+                context => context.Database.MigrateAsync(),
+                DisableEnsureCreated: true
+            )
+        );
+var dbContext = new ExampleDbContext(dbContextOptions);
+```
+Check out an [example test file](tests/ExampleWeb.UnitTests/UnitTestWithMigrations.cs) doing just that.
+
+#### Advanced example
 There's also a bit more [advanced example](tests/ExampleWeb.UnitTests/UnitTestBase.cs), which allows to choose
 Sqlite/Postgres/No database per test.
 

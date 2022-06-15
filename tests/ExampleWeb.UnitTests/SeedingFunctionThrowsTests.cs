@@ -24,7 +24,7 @@ public class SeedingFunctionThrowsTests : UnitTestBase
         Assert.ThrowsAny<Exception>(
             () =>
             {
-                _databaseInitializer.CreateDatabaseGetDbContextOptionsBuilderSync(
+                _databaseInitializer?.CreateDatabaseGetDbContextOptionsBuilderSync(
                     new DatabaseSeedingOptions<ExampleDbContext>(
                         Name: hash,
                         async context =>
@@ -40,7 +40,7 @@ public class SeedingFunctionThrowsTests : UnitTestBase
         Assert.ThrowsAny<Exception>(
             () =>
             {
-                _databaseInitializer.CreateDatabaseGetDbContextOptionsBuilderSync(
+                _databaseInitializer?.CreateDatabaseGetDbContextOptionsBuilderSync(
                     new DatabaseSeedingOptions<ExampleDbContext>(
                         Name: hash,
                         async context =>

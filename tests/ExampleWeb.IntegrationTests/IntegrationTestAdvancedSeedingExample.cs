@@ -75,7 +75,7 @@ public class IntegrationTestAdvancedSeedingExample : IDisposable
     public async Task Test()
     {
         var result = await _httpClient.GetFromJsonAsync<List<string>>("/users-from-service");
-        Assert.Equal(new string[] { "John", "Bill", "qwe" }, result);
+        Assert.Equal(new string[] { "John", "Bill", "Ilon", "qwe" }, result);
     }
 
     public void Dispose()

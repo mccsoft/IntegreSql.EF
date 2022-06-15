@@ -33,7 +33,12 @@ public class PostgresWithoutEnsureCreatedTests : IntegrationTestBaseWithoutEnsur
     {
         var result = await _httpClient.GetFromJsonAsync<List<UserDto>>("/users");
         Assert.Equal(
-            new List<UserDto>() { new UserDto(1, "John"), new UserDto(2, "Bill"), },
+            new List<UserDto>()
+            {
+                new UserDto(1, "John"),
+                new UserDto(2, "Bill"),
+                new UserDto(3, "Ilon"),
+            },
             result
         );
     }
@@ -52,6 +57,6 @@ public class PostgresWithoutEnsureCreatedTests : IntegrationTestBaseWithoutEnsur
 #pragma warning restore xUnit1026
     {
         var result = await _httpClient.GetFromJsonAsync<List<string>>("/users-from-service");
-        Assert.Equal(new string[] { "John", "Bill", }, result);
+        Assert.Equal(new string[] { "John", "Bill", "Ilon" }, result);
     }
 }
