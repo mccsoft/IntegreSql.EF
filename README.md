@@ -84,8 +84,8 @@ Here's a step-by-step guide, which will show how to create a DbContext pointing 
        ```
     4. Create a database context to be used in test: ```new ExampleDbContext(_dbContextOptions)```
 
-#### Using Migrations to set up database
-If you want to use Migrations to create a test database, you could do the following
+#### Use Migrations to set up database
+If you want to use Migrations to create a test database, you could do the following  ([example](tests/ExampleWeb.UnitTests/UnitTestWithMigrations.cs)):
 ```csharp
 var dbContextOptions = _databaseInitializer.CreateDatabaseGetDbContextOptionsBuilderSync(
             new DatabaseSeedingOptions<ExampleDbContext>(
@@ -96,7 +96,26 @@ var dbContextOptions = _databaseInitializer.CreateDatabaseGetDbContextOptionsBui
         );
 var dbContext = new ExampleDbContext(dbContextOptions);
 ```
-Check out an [example test file](tests/ExampleWeb.UnitTests/UnitTestWithMigrations.cs) doing just that.
+
+#### Seed data for all tests
+If you have some seed data that you want all tests to use, you could seed this data into template database ([example](tests/ExampleWeb.UnitTests/UnitTestWithCustomSeedData.cs)).
+```csharp
+_dbContextOptions = _databaseInitializer
+            .CreateDatabaseGetDbContextOptionsBuilderSync<ExampleDbContext>(
+                new DatabaseSeedingOptions<ExampleDbContext>(
+                    "DatabaseWithSeedData",
+                    async context =>
+                    {
+                        // Insert any data or do whatever you want with DbContext.
+                        // This will be saved into 'template' database that will be cloned for every test.
+                        context.Users.Add(new User() { Id = 5, Name = "Eugene" });
+                        await context.SaveChangesAsync();
+                    }
+                )
+            )
+            .Options;
+var dbContext = new ExampleDbContext(dbContextOptions);
+```
 
 #### Advanced example
 There's also a bit more [advanced example](tests/ExampleWeb.UnitTests/UnitTestBase.cs), which allows to choose
@@ -204,4 +223,4 @@ Though, it's not recommended per se (as it's a bit complicated and slower than s
 
 This library supports that and you could check out [an example](tests/ExampleWeb.IntegrationTests/IntegrationTestAdvancedSeedingExample.cs) doing just that.
 
-P.S. The example is intentionally simplified and could be easily converted to DbContext-based seeding, and serves the demonstration purposes only.
+P.S. The example is intentionally simplified and serves the demonstration purposes only (in real world this example should be converted to [DbContext seeding](#seed-data-for-all-tests)).
