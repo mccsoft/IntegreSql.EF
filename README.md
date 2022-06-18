@@ -8,6 +8,8 @@
 Provides an infrastructure to easily write **FAST** integration and unit tests using **REAL** databases in ASP.Net Core using EntityFramework.
 Powered by the greatest [IntegreSQL](https://github.com/allaboutapps/integresql#integresql).
 
+Short story of how FAST it is: 66 tests execution went from 9 minutes (on PostgreSQL) to 30 seconds (on IntegreSQL) 
+
 ## TL/DR
 Use `new IntegreSqlClient()` if you just want a strongly-typed API to IntegreSQL.
 
