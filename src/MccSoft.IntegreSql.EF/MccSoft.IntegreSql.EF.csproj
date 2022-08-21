@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>0.8.9</Version>
+        <Version>0.8.10</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Authors>MCC Soft</Authors>
         <Description>OpenIddict extension to support Auth code flow fo built-in ASP.Net identity providers</Description>
