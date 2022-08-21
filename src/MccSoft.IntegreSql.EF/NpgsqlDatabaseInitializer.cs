@@ -188,6 +188,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
             Username = ConnectionStringOverride?.Username ?? databaseConfig.Username,
             Password = ConnectionStringOverride?.Password ?? databaseConfig.Password,
             Pooling = false,
+            IncludeErrorDetail = true,
             //KeepAlive = 0,
         };
         var connectionString = builder.ToString();
