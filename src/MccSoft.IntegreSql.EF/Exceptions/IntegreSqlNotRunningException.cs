@@ -2,7 +2,7 @@
 
 namespace MccSoft.IntegreSql.EF.Exceptions;
 
-public class IntegreSqlNotRunningException : Exception
+public class IntegreSqlNotRunningException : IntegreSqlException
 {
     public IntegreSqlNotRunningException(string uri, Exception innerException = null)
         : base(

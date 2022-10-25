@@ -2,7 +2,7 @@ using System;
 
 namespace MccSoft.IntegreSql.EF.Exceptions;
 
-public class IntegreSqlTemplateNotFoundException : Exception
+public class IntegreSqlTemplateNotFoundException : IntegreSqlException
 {
     public IntegreSqlTemplateNotFoundException(string templateHash)
         : base(

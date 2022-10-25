@@ -2,7 +2,7 @@
 
 namespace MccSoft.IntegreSql.EF.Exceptions;
 
-public class IntegreSqlInternalServerErrorException : Exception
+public class IntegreSqlInternalServerErrorException : IntegreSqlException
 {
     public IntegreSqlInternalServerErrorException(string content, Exception innerException = null)
         : base(
