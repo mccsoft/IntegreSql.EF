@@ -154,18 +154,24 @@ public class IntegreSqlClient
             return await response.Content.ReadFromJsonAsync<GetDatabaseDto>();
         }
 
-        if (response.StatusCode == HttpStatusCode.NotFound)
+        switch (response.StatusCode)
         {
-            throw new IntegreSqlTemplateNotFoundException(hash);
+            case HttpStatusCode.NotFound:
+                throw new IntegreSqlTemplateNotFoundException(hash);
+
+            case HttpStatusCode.ServiceUnavailable:
+                throw new IntegreSqlPostgresNotAvailableException(
+                    _httpClient.BaseAddress?.ToString()
+                );
+
+            case HttpStatusCode.Gone:
+                throw new IntegreSqlTemplateDiscardedException(hash);
+
+            case HttpStatusCode.InternalServerError:
+                var content = await response.Content.ReadAsStringAsync();
+                throw new IntegreSqlInternalServerErrorException(content);
         }
-        if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
-        {
-            throw new IntegreSqlPostgresNotAvailableException(_httpClient.BaseAddress?.ToString());
-        }
-        if (response.StatusCode == HttpStatusCode.Gone)
-        {
-            throw new IntegreSqlTemplateDiscardedException(hash);
-        }
+
         response.EnsureSuccessStatusCode();
 
         throw new NotImplementedException("We should never reach this point");
