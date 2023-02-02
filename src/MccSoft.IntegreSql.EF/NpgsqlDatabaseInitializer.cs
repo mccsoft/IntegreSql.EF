@@ -157,12 +157,10 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 
     public override async Task RemoveDatabase(string connectionString)
     {
-        await using var connection = new NpgsqlConnection(connectionString);
-        string database = connection.Database;
-        connection.Open();
-        connection.ChangeDatabase("postgres");
-        var command = new NpgsqlCommand($"DROP DATABASE \"{database}\"", connection);
-        command.ExecuteNonQuery();
+        // Do nothing.
+        // Old databases will be reused by IntegreSQL automatically.
+        // Previously we were removing databases here which actually interfere with IntegreSQL.
+        // It was 'hanging' when tried to reuse the removed databases.
     }
 
     public override void UseProvider(DbContextOptionsBuilder options, string connectionString)
