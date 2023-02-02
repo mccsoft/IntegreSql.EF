@@ -31,6 +31,18 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     /// </summary>
     public static bool UseMd5Hash = true;
 
+    /// <summary>
+    /// Drop database at the end of each test (when true) or not.
+    ///
+    /// Old databases will be reused by IntegreSQL automatically.
+    /// Previously we were removing databases by default, which actually interfere with IntegreSQL.
+    /// It was 'hanging' when tried to reuse the removed databases.
+    /// However, it was reported that if not dropped, Postgres starts to consume a lot of RAM.
+    /// So one might be willing to drop anyway
+    /// (though, for the latter case I'd recommend reducing the `INTEGRESQL_TEST_MAX_POOL_SIZE` in docker).
+    /// </summary>
+    public bool DropDatabaseOnRemove { get; set; }
+
     private record ConnectionStringInfo(string Hash, int Id);
 
     /// <summary>
@@ -157,10 +169,24 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 
     public override async Task RemoveDatabase(string connectionString)
     {
-        // Do nothing.
-        // Old databases will be reused by IntegreSQL automatically.
-        // Previously we were removing databases here which actually interfere with IntegreSQL.
-        // It was 'hanging' when tried to reuse the removed databases.
+        if (DropDatabaseOnRemove)
+        {
+            await using var connection = new NpgsqlConnection(connectionString);
+            string database = connection.Database;
+            connection.Open();
+            connection.ChangeDatabase("postgres");
+            var command = new NpgsqlCommand($"DROP DATABASE \"{database}\"", connection);
+            command.ExecuteNonQuery();
+        }
+        else
+        {
+            // Do nothing by default.
+            // Old databases will be reused by IntegreSQL automatically.
+            // Previously we were removing databases here which actually interfere with IntegreSQL.
+            // It was 'hanging' when tried to reuse the removed databases.
+            // However, it was reported that if not dropped, Postgres starts to consume a lot of RAM.
+            // So one might be willing to drop anyway.
+        }
     }
 
     public override void UseProvider(DbContextOptionsBuilder options, string connectionString)
