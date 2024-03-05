@@ -143,11 +143,35 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
         GetDatabaseDto newDatabase = await _integreSqlClient
             .GetTestDatabase(databaseHash)
             .ConfigureAwait(false);
-        return GetConnectionString(
+        var connectionString = GetConnectionString(
             newDatabase.Database.Config,
             newDatabase.Database.TemplateHash,
             newDatabase.Id
         );
+
+        // Due to https://github.com/allaboutapps/integresql/issues/17
+        // IntegreSQL returns connection string before database is actually available.
+        // So we have to wait.
+        await WaitUntilDatabaseIsCreated(connectionString);
+
+        return connectionString;
+    }
+
+    private async Task WaitUntilDatabaseIsCreated(string connectionString)
+    {
+        for (int i = 0; i < 100; i++)
+        {
+            try
+            {
+                await using var conn = new NpgsqlConnection(connectionString);
+                await conn.OpenAsync();
+                return;
+            }
+            catch (PostgresException e) when (e.SqlState == "3D000")
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
+            }
+        }
     }
 
     /// <summary>
