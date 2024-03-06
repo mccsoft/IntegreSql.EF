@@ -60,8 +60,8 @@ public class IntegreSqlClient
 
         if (response.IsSuccessStatusCode)
         {
-            return await response.Content
-                .ReadFromJsonAsync<CreateTemplateDto>()
+            return await response
+                .Content.ReadFromJsonAsync<CreateTemplateDto>()
                 .ConfigureAwait(false);
         }
 
@@ -177,6 +177,49 @@ public class IntegreSqlClient
         throw new NotImplementedException("We should never reach this point");
     }
 
+    /// <summary>
+    /// Returns test database to a pool (which allows consequent tests to reuse this database).
+    /// This method (contrary to <see cref="ReturnTestDatabase"/>) will tell IntegreSQL to cleanup the database.
+    /// </summary>
+    public async Task ReleaseTestDatabase(string hash, int id)
+    {
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient
+                .PostAsync($"templates/{hash}/tests/{id}/recreate", null)
+                .ConfigureAwait(false);
+        }
+        catch (HttpRequestException e)
+        {
+            throw new IntegreSqlNotRunningException(_httpClient.BaseAddress?.ToString(), e);
+        }
+
+        if (response.IsSuccessStatusCode)
+            return;
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            throw new IntegreSqlTemplateNotFoundException(hash);
+        }
+        if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
+        {
+            throw new IntegreSqlPostgresNotAvailableException(_httpClient.BaseAddress?.ToString());
+        }
+
+        response.EnsureSuccessStatusCode();
+        throw new NotImplementedException("We should never reach this point");
+    }
+
+    /// <summary>
+    /// Returns test database to a pool (which allows consequent tests to reuse this database).
+    /// Note that you need to clean up database by yourself before returning it to the pool!
+    /// If you return a dirty database, consequent tests might fail!
+    /// If you don't want to clean it up, just don't use this function.
+    /// Dirty databases are automatically deleted by IntegreSQL once database number exceeds a certain limit (500 by default).
+    ///
+    /// Consider using <see cref="ReleaseTestDatabase"/> if you want the DB to be deleted/recreated by IntegreSQL
+    /// </summary>
     public async Task ReturnTestDatabase(string hash, int id)
     {
         HttpResponseMessage response;

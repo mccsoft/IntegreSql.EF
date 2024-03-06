@@ -30,11 +30,14 @@ public class UnitTestBase : IDisposable
         {
             null => null,
             DatabaseType.Postgres
-              => new NpgsqlDatabaseInitializer(
-                  // This is needed if you run tests NOT inside the container.
-                  // 5434 is the public port number of Postgresql instance
-                  connectionStringOverride: new() { Host = "localhost", Port = 5434 }
-              ),
+                => new NpgsqlDatabaseInitializer(
+                    // This is needed if you run tests NOT inside the container.
+                    // 5434 is the public port number of Postgresql instance
+                    connectionStringOverride: new() { Host = "localhost", Port = 5434 }
+                )
+                {
+                    DropDatabaseOnRemove = true,
+                },
             DatabaseType.Sqlite => new SqliteDatabaseInitializer(),
             _ => throw new ArgumentOutOfRangeException(nameof(databaseType), databaseType, null)
         };

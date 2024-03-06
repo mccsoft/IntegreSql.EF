@@ -16,7 +16,8 @@ public interface IDatabaseInitializer : IDisposable, IUseProvider
     /// <returns>Connection string to a copy of template database</returns>
     Task<string> CreateDatabaseGetConnectionString<TDbContext>(
         DatabaseSeedingOptions<TDbContext> databaseSeeding = null
-    ) where TDbContext : DbContext;
+    )
+        where TDbContext : DbContext;
 
     /// <summary>
     /// Creates a template database (if not created before) using DbContext.Database.EnsureCreated and
@@ -28,7 +29,8 @@ public interface IDatabaseInitializer : IDisposable, IUseProvider
     /// <returns>Connection string to a copy of template database</returns>
     string CreateDatabaseGetConnectionStringSync<TDbContext>(
         DatabaseSeedingOptions<TDbContext> databaseSeeding = null
-    ) where TDbContext : DbContext;
+    )
+        where TDbContext : DbContext;
 
     /// <summary>
     /// Creates the DbContextOptionsBuilder for passed connection string.
@@ -36,7 +38,8 @@ public interface IDatabaseInitializer : IDisposable, IUseProvider
     /// </summary>
     DbContextOptionsBuilder<TDbContext> CreateDbContextOptionsBuilder<TDbContext>(
         string connectionString
-    ) where TDbContext : DbContext;
+    )
+        where TDbContext : DbContext;
 
     /// <summary>
     /// Creates the database using <see cref="CreateDatabaseGetConnectionString{TDbContext}"/>
@@ -45,7 +48,8 @@ public interface IDatabaseInitializer : IDisposable, IUseProvider
     /// </summary>
     Task<DbContextOptionsBuilder<TDbContext>> CreateDatabaseGetDbContextOptionsBuilder<TDbContext>(
         DatabaseSeedingOptions<TDbContext> seedingOptions = null
-    ) where TDbContext : DbContext;
+    )
+        where TDbContext : DbContext;
 
     /// <summary>
     /// Creates the database using <see cref="CreateDatabaseGetConnectionString{TDbContext}"/>
@@ -54,10 +58,12 @@ public interface IDatabaseInitializer : IDisposable, IUseProvider
     /// </summary>
     DbContextOptionsBuilder<TDbContext> CreateDatabaseGetDbContextOptionsBuilderSync<TDbContext>(
         DatabaseSeedingOptions<TDbContext> seedingOptions = null
-    ) where TDbContext : DbContext;
+    )
+        where TDbContext : DbContext;
 
     /// <summary>
     /// Returns test database to a pool.
+    /// You need to cleanup the data in that database yourself!
     /// </summary>
     Task ReturnDatabaseToPool(string connectionString);
 
@@ -85,5 +91,6 @@ public interface IDatabaseInitializer : IDisposable, IUseProvider
     void UseProvider<TDbContext>(
         DbContextOptionsBuilder options,
         DatabaseSeedingOptions<TDbContext> databaseSeedingOptions
-    ) where TDbContext : DbContext;
+    )
+        where TDbContext : DbContext;
 }

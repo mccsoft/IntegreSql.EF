@@ -24,32 +24,28 @@ public class IntegrationTestBase : IDisposable
             new DatabaseSeedingOptions<ExampleDbContext>(Name: "Integration")
         );
 
-        var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(
-            builder =>
+        var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureAppConfiguration(
+                (context, configuration) =>
+                {
+                    configuration.AddInMemoryCollection(
+                        new KeyValuePair<string, string>[] { new("DisableSeed", "true") }
+                    );
+                }
+            );
+            builder.ConfigureServices(services =>
             {
-                builder.ConfigureAppConfiguration(
-                    (context, configuration) =>
-                    {
-                        configuration.AddInMemoryCollection(
-                            new KeyValuePair<string, string>[] { new("DisableSeed", "true") }
-                        );
-                    }
+                var descriptor = services.Single(d =>
+                    d.ServiceType == typeof(DbContextOptions<ExampleDbContext>)
                 );
-                builder.ConfigureServices(
-                    services =>
-                    {
-                        var descriptor = services.Single(
-                            d => d.ServiceType == typeof(DbContextOptions<ExampleDbContext>)
-                        );
-                        services.Remove(descriptor);
+                services.Remove(descriptor);
 
-                        services.AddDbContext<ExampleDbContext>(
-                            options => _databaseInitializer.UseProvider(options, _connectionString)
-                        );
-                    }
+                services.AddDbContext<ExampleDbContext>(options =>
+                    _databaseInitializer.UseProvider(options, _connectionString)
                 );
-            }
-        );
+            });
+        });
 
         _httpClient = webAppFactory.CreateDefaultClient();
     }
@@ -59,11 +55,14 @@ public class IntegrationTestBase : IDisposable
         return databaseType switch
         {
             DatabaseType.Postgres
-              => new NpgsqlDatabaseInitializer(
-                  // This is needed if you run tests NOT inside the container.
-                  // 5434 is the public port number of Postgresql instance
-                  connectionStringOverride: new() { Host = "localhost", Port = 5434, }
-              ),
+                => new NpgsqlDatabaseInitializer(
+                    // This is needed if you run tests NOT inside the container.
+                    // 5434 is the public port number of Postgresql instance
+                    connectionStringOverride: new() { Host = "localhost", Port = 5434, }
+                )
+                {
+                    DropDatabaseOnRemove = true,
+                },
             DatabaseType.Sqlite => new SqliteDatabaseInitializer(),
             _ => throw new ArgumentOutOfRangeException(nameof(databaseType), databaseType, null)
         };

@@ -32,14 +32,9 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     public static bool UseMd5Hash = true;
 
     /// <summary>
-    /// Drop database at the end of each test (when true) or not.
+    /// Release database (call IntegreSQL /api/v1/templates/:hash/tests/:id/recreate) at the end of each test (when true) or not.
     ///
-    /// Old databases will be reused by IntegreSQL automatically.
-    /// Previously we were removing databases by default, which actually interfere with IntegreSQL.
-    /// It was 'hanging' when tried to reuse the removed databases.
-    /// However, it was reported that if not dropped, Postgres starts to consume a lot of RAM.
-    /// So one might be willing to drop anyway
-    /// (though, for the latter case I'd recommend reducing the `INTEGRESQL_TEST_MAX_POOL_SIZE` in docker).
+    /// This API is available starting from IntegreSQL v1.1
     /// </summary>
     public bool DropDatabaseOnRemove { get; set; }
 
@@ -195,12 +190,12 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     {
         if (DropDatabaseOnRemove)
         {
-            await using var connection = new NpgsqlConnection(connectionString);
-            string database = connection.Database;
-            connection.Open();
-            connection.ChangeDatabase("postgres");
-            var command = new NpgsqlCommand($"DROP DATABASE \"{database}\"", connection);
-            command.ExecuteNonQuery();
+            var connectionStringInfo = ConnectionStringInfos[connectionString];
+
+            await _integreSqlClient.ReturnTestDatabase(
+                connectionStringInfo.Hash,
+                connectionStringInfo.Id
+            );
         }
         else
         {
