@@ -192,7 +192,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
         {
             var connectionStringInfo = ConnectionStringInfos[connectionString];
 
-            await _integreSqlClient.ReturnTestDatabase(
+            await _integreSqlClient.ReleaseTestDatabase(
                 connectionStringInfo.Hash,
                 connectionStringInfo.Id
             );
