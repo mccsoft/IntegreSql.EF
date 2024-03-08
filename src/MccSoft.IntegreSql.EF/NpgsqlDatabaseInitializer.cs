@@ -192,7 +192,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
         {
             var connectionStringInfo = ConnectionStringInfos[connectionString];
 
-            await _integreSqlClient.ReleaseTestDatabase(
+            await _integreSqlClient.RecreateTestDatabase(
                 connectionStringInfo.Hash,
                 connectionStringInfo.Id
             );
@@ -220,9 +220,6 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 
     private string GetConnectionString(Config databaseConfig, string hash, int id)
     {
-        if (UseMd5Hash)
-            hash = Md5Hasher.CreateMD5(hash);
-
         var builder = new NpgsqlConnectionStringBuilder()
         {
             Host = ConnectionStringOverride?.Host ?? databaseConfig.Host,

@@ -17,7 +17,10 @@ public class UnitTestSimplified : IDisposable
             // This is needed if you run tests NOT inside the container.
             // 5434 is the public port number of Postgresql instance
             connectionStringOverride: new() { Host = "localhost", Port = 5434, }
-        );
+        )
+        {
+            DropDatabaseOnRemove = true,
+        };
         _dbContextOptions = _databaseInitializer
             .CreateDatabaseGetDbContextOptionsBuilderSync<ExampleDbContext>()
             .Options;
@@ -31,6 +34,7 @@ public class UnitTestSimplified : IDisposable
     [Fact]
     public async Task Test1()
     {
+        var connectionString = CreateDbContext().Database.GetConnectionString();
         var service = new UserService(CreateDbContext());
         var users = await service.GetUsers();
         Assert.Equal(new[] { "John", "Bill" }, users);

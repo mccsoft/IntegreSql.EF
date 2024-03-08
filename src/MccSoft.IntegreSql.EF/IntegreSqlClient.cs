@@ -181,7 +181,7 @@ public class IntegreSqlClient
     /// Returns test database to a pool (which allows consequent tests to reuse this database).
     /// This method (contrary to <see cref="ReturnTestDatabase"/>) will tell IntegreSQL to cleanup the database.
     /// </summary>
-    public async Task ReleaseTestDatabase(string hash, int id)
+    public async Task RecreateTestDatabase(string hash, int id)
     {
         HttpResponseMessage response;
         try
@@ -218,7 +218,7 @@ public class IntegreSqlClient
     /// If you don't want to clean it up, just don't use this function.
     /// Dirty databases are automatically deleted by IntegreSQL once database number exceeds a certain limit (500 by default).
     ///
-    /// Consider using <see cref="ReleaseTestDatabase"/> if you want the DB to be deleted/recreated by IntegreSQL
+    /// Consider using <see cref="RecreateTestDatabase"/> if you want the DB to be deleted/recreated by IntegreSQL
     /// </summary>
     public async Task ReturnTestDatabase(string hash, int id)
     {
