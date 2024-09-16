@@ -35,37 +35,33 @@ public class IntegrationTestSimplified : IDisposable
         );
 
         // Create a standard WebApplicationFactory to set up web app in tests
-        var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(
-            builder =>
+        var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            // Inject 'DisableSeed' configuration variable to disable running Migrations in Startup
+            builder.ConfigureAppConfiguration(
+                (context, configuration) =>
+                {
+                    configuration.AddInMemoryCollection(
+                        new KeyValuePair<string, string>[] { new("DisableSeed", "true") }
+                    );
+                }
+            );
+
+            // Adjust DI configurations with test-specifics
+            builder.ConfigureServices(services =>
             {
-                // Inject 'DisableSeed' configuration variable to disable running Migrations in Startup
-                builder.ConfigureAppConfiguration(
-                    (context, configuration) =>
-                    {
-                        configuration.AddInMemoryCollection(
-                            new KeyValuePair<string, string>[] { new("DisableSeed", "true") }
-                        );
-                    }
+                // Remove default DbContext registration from DI
+                var descriptor = services.Single(d =>
+                    d.ServiceType == typeof(DbContextOptions<ExampleDbContext>)
                 );
+                services.Remove(descriptor);
 
-                // Adjust DI configurations with test-specifics
-                builder.ConfigureServices(
-                    services =>
-                    {
-                        // Remove default DbContext registration from DI
-                        var descriptor = services.Single(
-                            d => d.ServiceType == typeof(DbContextOptions<ExampleDbContext>)
-                        );
-                        services.Remove(descriptor);
-
-                        // Add new DbContext registration
-                        services.AddDbContext<ExampleDbContext>(
-                            options => _databaseInitializer.UseProvider(options, _connectionString)
-                        );
-                    }
+                // Add new DbContext registration
+                services.AddDbContext<ExampleDbContext>(options =>
+                    _databaseInitializer.UseProvider(options, _connectionString)
                 );
-            }
-        );
+            });
+        });
 
         // Create http client to connect to our TestServer within test
         _httpClient = webAppFactory.CreateDefaultClient();

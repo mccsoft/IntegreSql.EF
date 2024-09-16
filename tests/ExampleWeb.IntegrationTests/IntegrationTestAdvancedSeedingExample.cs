@@ -48,24 +48,20 @@ public class IntegrationTestAdvancedSeedingExample : IDisposable
 
     private WebApplicationFactory<Program> CreateWebApplication(string connectionString)
     {
-        var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(
-            builder =>
+        var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
             {
-                builder.ConfigureServices(
-                    services =>
-                    {
-                        var descriptor = services.Single(
-                            d => d.ServiceType == typeof(DbContextOptions<ExampleDbContext>)
-                        );
-                        services.Remove(descriptor);
-
-                        services.AddDbContext<ExampleDbContext>(
-                            options => _databaseInitializer.UseProvider(options, connectionString)
-                        );
-                    }
+                var descriptor = services.Single(d =>
+                    d.ServiceType == typeof(DbContextOptions<ExampleDbContext>)
                 );
-            }
-        );
+                services.Remove(descriptor);
+
+                services.AddDbContext<ExampleDbContext>(options =>
+                    _databaseInitializer.UseProvider(options, connectionString)
+                );
+            });
+        });
         _httpClient = webAppFactory.CreateDefaultClient();
 
         return webAppFactory;

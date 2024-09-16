@@ -1,12 +1,11 @@
 using ExampleWeb;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<UserService>();
-builder.Services.AddDbContext<ExampleDbContext>(
-    options => options.UseNpgsql(builder.Configuration.GetValue<string>("Postgres"))
+builder.Services.AddDbContext<ExampleDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetValue<string>("Postgres"))
 );
 
 // builder.Services.AddDbContext<ExampleDbContext>(
@@ -21,8 +20,8 @@ var app = builder.Build();
 // if you use CreateDatabaseGetConnectionString).
 if (app.Configuration.GetValue<bool>("DisableSeed") != true)
 {
-    await app.Services
-        .CreateScope()
+    await app
+        .Services.CreateScope()
         .ServiceProvider.GetRequiredService<ExampleDbContext>()
         .Database.MigrateAsync();
 }
@@ -32,10 +31,10 @@ app.MapGet(
     "/database-type",
     (ExampleDbContext dbContext) =>
         dbContext.Database.IsNpgsql()
-          ? "postgres"
-          : dbContext.Database.IsSqlite()
-              ? "sqlite"
-              : "unknown"
+            ? "postgres"
+            : dbContext.Database.IsSqlite()
+                ? "sqlite"
+                : "unknown"
 );
 app.MapGet(
     "/users",

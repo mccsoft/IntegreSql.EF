@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using MccSoft.IntegreSql.EF;
 using MccSoft.IntegreSql.EF.DatabaseInitialization;
 using Xunit;
@@ -10,7 +9,8 @@ public class SeedingFunctionThrowsTests : UnitTestBase
 {
     private readonly UserService _service;
 
-    public SeedingFunctionThrowsTests() : base(DatabaseType.Sqlite)
+    public SeedingFunctionThrowsTests()
+        : base(DatabaseType.Sqlite)
     {
         _service = new UserService(CreateDbContext());
     }
@@ -21,35 +21,31 @@ public class SeedingFunctionThrowsTests : UnitTestBase
         string hash = nameof(SeedingFunctionThrowsTests) + Guid.NewGuid();
         SqliteDatabaseInitializer.ClearInitializationTasks();
 
-        Assert.ThrowsAny<Exception>(
-            () =>
-            {
-                _databaseInitializer?.CreateDatabaseGetDbContextOptionsBuilderSync(
-                    new DatabaseSeedingOptions<ExampleDbContext>(
-                        Name: hash,
-                        async context =>
-                        {
-                            throw new InvalidOperationException("zxc");
-                        }
-                    )
-                );
-            }
-        );
+        Assert.ThrowsAny<Exception>(() =>
+        {
+            _databaseInitializer?.CreateDatabaseGetDbContextOptionsBuilderSync(
+                new DatabaseSeedingOptions<ExampleDbContext>(
+                    Name: hash,
+                    async context =>
+                    {
+                        throw new InvalidOperationException("zxc");
+                    }
+                )
+            );
+        });
         SqliteDatabaseInitializer.ClearInitializationTasks();
 
-        Assert.ThrowsAny<Exception>(
-            () =>
-            {
-                _databaseInitializer?.CreateDatabaseGetDbContextOptionsBuilderSync(
-                    new DatabaseSeedingOptions<ExampleDbContext>(
-                        Name: hash,
-                        async context =>
-                        {
-                            throw new InvalidOperationException("zxc");
-                        }
-                    )
-                );
-            }
-        );
+        Assert.ThrowsAny<Exception>(() =>
+        {
+            _databaseInitializer?.CreateDatabaseGetDbContextOptionsBuilderSync(
+                new DatabaseSeedingOptions<ExampleDbContext>(
+                    Name: hash,
+                    async context =>
+                    {
+                        throw new InvalidOperationException("zxc");
+                    }
+                )
+            );
+        });
     }
 }
