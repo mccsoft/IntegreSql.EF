@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace MccSoft.IntegreSql.EF.DatabaseInitialization;
 
@@ -56,6 +57,7 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
             .ConfigureAwait(false)
             .GetAwaiter()
             .GetResult();
+        options.ConfigureWarnings(x => x.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
         UseProvider(options, connectionString);
     }
 

@@ -223,8 +223,6 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 
     public override void UseProvider(DbContextOptionsBuilder options, string connectionString)
     {
-        options.ConfigureWarnings(x => x.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
-
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
         _adjustNpgsqlDataSource?.Invoke(dataSourceBuilder);
         var dataSource = dataSourceBuilder.Build();
