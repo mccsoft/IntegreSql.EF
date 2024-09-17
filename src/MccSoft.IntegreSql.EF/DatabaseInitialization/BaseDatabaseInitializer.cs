@@ -44,7 +44,10 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     }
 
     /// <inheritdoc cref="IDatabaseInitializer.UseProvider"/>
-    public abstract void UseProvider(DbContextOptionsBuilder options, string connectionString);
+    public virtual void UseProvider(DbContextOptionsBuilder options, string connectionString)
+    {
+        options.ConfigureWarnings(x => x.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
+    }
 
     /// <inheritdoc cref="IDatabaseInitializer.UseProvider{TDbContext}"/>
     public void UseProvider<TDbContext>(
@@ -57,7 +60,6 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
             .ConfigureAwait(false)
             .GetAwaiter()
             .GetResult();
-        options.ConfigureWarnings(x => x.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
         UseProvider(options, connectionString);
     }
 

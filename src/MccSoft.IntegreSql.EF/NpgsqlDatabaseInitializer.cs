@@ -223,6 +223,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 
     public override void UseProvider(DbContextOptionsBuilder options, string connectionString)
     {
+        base.UseProvider(options, connectionString);
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
         _adjustNpgsqlDataSource?.Invoke(dataSourceBuilder);
         var dataSource = dataSourceBuilder.Build();
