@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MccSoft.IntegreSql.EF.DatabaseInitialization;
 using MccSoft.IntegreSql.EF.Dto;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Npgsql;
 
 namespace MccSoft.IntegreSql.EF;
@@ -14,6 +15,7 @@ namespace MccSoft.IntegreSql.EF;
 public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 {
     private readonly IntegreSqlClient _integreSqlClient;
+    private readonly Action<NpgsqlDataSourceBuilder> _adjustNpgsqlDataSource;
 
     /// <summary>
     /// When <see cref="GetConnectionString"/> is called, IntegreSQL returns a connection string it uses to connect to PostgreSQL.
@@ -57,13 +59,18 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     /// So you could override some connection string by defining <paramref name="connectionStringOverride"/>
     /// and setting some properties to non-null values.
     /// </param>
+    /// <param name="adjustNpgsqlDataSource">
+    /// Action that allows to adjust NpgsqlDataSourceBuilder before creating Npgsql connection.
+    /// </param>
     public NpgsqlDatabaseInitializer(
         Uri integreSqlUri = null,
-        ConnectionStringOverride connectionStringOverride = null
+        ConnectionStringOverride connectionStringOverride = null,
+        Action<NpgsqlDataSourceBuilder> adjustNpgsqlDataSource = null
     )
     {
         integreSqlUri ??= new Uri("http://localhost:5000/api/v1/");
         _integreSqlClient = new IntegreSqlClient(integreSqlUri);
+        _adjustNpgsqlDataSource = adjustNpgsqlDataSource;
         ConnectionStringOverride = connectionStringOverride;
     }
 
@@ -79,6 +86,12 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     /// Key of dictionary is database hash, value - a Task which completes when database initialization is complete.
     /// </summary>
     private static readonly LazyConcurrentDictionary<string, Task> InitializationTasks;
+
+    protected override string AdjustConnectionStringOnSeeding(string connectionString)
+    {
+        // Required to be able to get password from DbContext.Database.GetConnectionString()
+        return "Persist Security Info=true;" + connectionString;
+    }
 
     /// <summary>
     /// Returns a PostgreSQL connection string to be used in the test.
@@ -210,7 +223,12 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 
     public override void UseProvider(DbContextOptionsBuilder options, string connectionString)
     {
-        options.UseNpgsql(connectionString);
+        base.UseProvider(options, connectionString);
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        _adjustNpgsqlDataSource?.Invoke(dataSourceBuilder);
+        var dataSource = dataSourceBuilder.Build();
+
+        options.UseNpgsql(dataSource);
     }
 
     protected override void PerformBasicSeedingOperations(DbContext dbContext)

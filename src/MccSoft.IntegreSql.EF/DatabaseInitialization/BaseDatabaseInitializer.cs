@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace MccSoft.IntegreSql.EF.DatabaseInitialization;
 
@@ -43,13 +44,17 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     }
 
     /// <inheritdoc cref="IDatabaseInitializer.UseProvider"/>
-    public abstract void UseProvider(DbContextOptionsBuilder options, string connectionString);
+    public virtual void UseProvider(DbContextOptionsBuilder options, string connectionString)
+    {
+        options.ConfigureWarnings(x => x.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning));
+    }
 
     /// <inheritdoc cref="IDatabaseInitializer.UseProvider{TDbContext}"/>
     public void UseProvider<TDbContext>(
         DbContextOptionsBuilder options,
         DatabaseSeedingOptions<TDbContext> databaseSeedingOptions
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         string connectionString = CreateDatabaseGetConnectionString(databaseSeedingOptions)
             .ConfigureAwait(false)
@@ -58,10 +63,16 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
         UseProvider(options, connectionString);
     }
 
+    protected virtual string AdjustConnectionStringOnSeeding(string connectionString)
+    {
+        return connectionString;
+    }
+
     /// <inheritdoc cref="IDatabaseInitializer.CreateDatabaseGetConnectionString{TDbContext}"/>
     public Task<string> CreateDatabaseGetConnectionString<TDbContext>(
         DatabaseSeedingOptions<TDbContext> databaseSeeding
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         string lastMigrationName = ContextHelper.GetLastMigrationName<TDbContext>() ?? "";
 
@@ -74,7 +85,7 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
             {
                 await using var dbContext = ContextHelper.CreateDbContext<TDbContext>(
                     useProvider: this,
-                    connectionString: connectionString,
+                    connectionString: AdjustConnectionStringOnSeeding(connectionString),
                     factoryMethod: databaseSeeding?.DbContextFactory
                 );
                 if (databaseSeeding?.DisableEnsureCreated != true)
@@ -92,7 +103,8 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     /// <inheritdoc cref="IDatabaseInitializer.CreateDatabaseGetConnectionStringSync{TDbContext}"/>
     public string CreateDatabaseGetConnectionStringSync<TDbContext>(
         DatabaseSeedingOptions<TDbContext> databaseSeeding = null
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         return TaskUtils.RunSynchronously(() => CreateDatabaseGetConnectionString(databaseSeeding));
     }
@@ -100,7 +112,8 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     /// <inheritdoc cref="IDatabaseInitializer.CreateDbContextOptionsBuilder{TDbContext}"/>
     public virtual DbContextOptionsBuilder<TDbContext> CreateDbContextOptionsBuilder<TDbContext>(
         string connectionString
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         var builder = new DbContextOptionsBuilder<TDbContext>();
         UseProvider(builder, connectionString);
@@ -114,7 +127,8 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
         DbContextOptionsBuilder<TDbContext>
     > CreateDatabaseGetDbContextOptionsBuilder<TDbContext>(
         DatabaseSeedingOptions<TDbContext> seedingOptions
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         var connectionString = await CreateDatabaseGetConnectionString(seedingOptions);
         return CreateDbContextOptionsBuilder<TDbContext>(connectionString);
@@ -123,7 +137,8 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     /// <inheritdoc cref="IDatabaseInitializer.CreateDatabaseGetDbContextOptionsBuilderSync{TDbContext}"/>
     public virtual DbContextOptionsBuilder<TDbContext> CreateDatabaseGetDbContextOptionsBuilderSync<TDbContext>(
         DatabaseSeedingOptions<TDbContext> seedingOptions = null
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         return TaskUtils.RunSynchronously(
             () => CreateDatabaseGetDbContextOptionsBuilder(seedingOptions)

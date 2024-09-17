@@ -6,7 +6,8 @@ public class ExampleDbContext : DbContext
 {
     public DbSet<User> Users { get; set; }
 
-    public ExampleDbContext(DbContextOptions<ExampleDbContext> options) : base(options) { }
+    public ExampleDbContext(DbContextOptions<ExampleDbContext> options)
+        : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

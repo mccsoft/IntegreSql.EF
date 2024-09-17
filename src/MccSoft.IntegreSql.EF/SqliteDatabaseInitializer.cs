@@ -84,6 +84,7 @@ public class SqliteDatabaseInitializer : BaseDatabaseInitializer
 
     public override void UseProvider(DbContextOptionsBuilder options, string connectionString)
     {
+        base.UseProvider(options, connectionString);
         options.UseSqlite(connectionString);
     }
 

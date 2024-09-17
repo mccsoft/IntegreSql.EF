@@ -25,24 +25,20 @@ public class IntegrationTestBaseWithoutEnsureCreated : IDisposable
             )
         );
 
-        var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(
-            builder =>
+        var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
             {
-                builder.ConfigureServices(
-                    services =>
-                    {
-                        var descriptor = services.Single(
-                            d => d.ServiceType == typeof(DbContextOptions<ExampleDbContext>)
-                        );
-                        services.Remove(descriptor);
-
-                        services.AddDbContext<ExampleDbContext>(
-                            options => _databaseInitializer.UseProvider(options, _connectionString)
-                        );
-                    }
+                var descriptor = services.Single(d =>
+                    d.ServiceType == typeof(DbContextOptions<ExampleDbContext>)
                 );
-            }
-        );
+                services.Remove(descriptor);
+
+                services.AddDbContext<ExampleDbContext>(options =>
+                    _databaseInitializer.UseProvider(options, _connectionString)
+                );
+            });
+        });
 
         _httpClient = webAppFactory.CreateDefaultClient();
     }
@@ -52,11 +48,11 @@ public class IntegrationTestBaseWithoutEnsureCreated : IDisposable
         return databaseType switch
         {
             DatabaseType.Postgres
-              => new NpgsqlDatabaseInitializer(
-                  // This is needed if you run tests NOT inside the container.
-                  // 5434 is the public port number of Postgresql instance
-                  connectionStringOverride: new() { Host = "localhost", Port = 5434 }
-              ),
+                => new NpgsqlDatabaseInitializer(
+                    // This is needed if you run tests NOT inside the container.
+                    // 5434 is the public port number of Postgresql instance
+                    connectionStringOverride: new() { Host = "localhost", Port = 5434 }
+                ),
             DatabaseType.Sqlite => new SqliteDatabaseInitializer(),
             _ => throw new ArgumentOutOfRangeException(nameof(databaseType), databaseType, null)
         };

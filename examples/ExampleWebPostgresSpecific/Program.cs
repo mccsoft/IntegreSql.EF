@@ -1,10 +1,11 @@
-using ExampleWeb;
+using ExampleWebPostgresSpecific;
+using ExampleWebPostgresSpecific.Database;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<UserService>();
-builder.Services.AddDbContext<ExampleDbContext>(options =>
+builder.Services.AddDbContext<ExamplePostgresSpecificDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetValue<string>("Postgres"))
 );
 
@@ -22,14 +23,14 @@ if (app.Configuration.GetValue<bool>("DisableSeed") != true)
 {
     await app
         .Services.CreateScope()
-        .ServiceProvider.GetRequiredService<ExampleDbContext>()
+        .ServiceProvider.GetRequiredService<ExamplePostgresSpecificDbContext>()
         .Database.MigrateAsync();
 }
 
 app.MapGet("/", () => "Hello World!");
 app.MapGet(
     "/database-type",
-    (ExampleDbContext dbContext) =>
+    (ExamplePostgresSpecificDbContext dbContext) =>
         dbContext.Database.IsNpgsql()
             ? "postgres"
             : dbContext.Database.IsSqlite()
@@ -38,15 +39,16 @@ app.MapGet(
 );
 app.MapGet(
     "/users",
-    async (ExampleDbContext dbContext) =>
-        await dbContext.Users.Select(x => new { x.Id, x.Name }).ToListAsync()
+    async (ExamplePostgresSpecificDbContext dbContext) =>
+        await dbContext.Users.OrderBy(x => x.Id).Select(x => new { x.Id, x.Name }).ToListAsync()
 );
 app.MapPost(
     "/users",
     async (context) =>
     {
         var user = await context.Request.ReadFromJsonAsync<User>();
-        var dbContext = context.RequestServices.GetRequiredService<ExampleDbContext>();
+        var dbContext =
+            context.RequestServices.GetRequiredService<ExamplePostgresSpecificDbContext>();
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
     }
