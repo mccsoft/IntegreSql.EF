@@ -59,6 +59,11 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
         UseProvider(options, connectionString);
     }
 
+    protected virtual string AdjustConnectionStringOnSeeding(string connectionString)
+    {
+        return connectionString;
+    }
+
     /// <inheritdoc cref="IDatabaseInitializer.CreateDatabaseGetConnectionString{TDbContext}"/>
     public Task<string> CreateDatabaseGetConnectionString<TDbContext>(
         DatabaseSeedingOptions<TDbContext> databaseSeeding
@@ -74,11 +79,9 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
                 + typeof(TDbContext).Assembly.FullName,
             async (connectionString) =>
             {
-                // Required to be able to get password from DbContext.Database.GetConnectionString()
-                var newConnectionString = "Persist Security Info=true;" + connectionString;
                 await using var dbContext = ContextHelper.CreateDbContext<TDbContext>(
                     useProvider: this,
-                    connectionString: newConnectionString,
+                    connectionString: AdjustConnectionStringOnSeeding(connectionString),
                     factoryMethod: databaseSeeding?.DbContextFactory
                 );
                 if (databaseSeeding?.DisableEnsureCreated != true)

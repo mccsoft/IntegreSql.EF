@@ -87,6 +87,12 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     /// </summary>
     private static readonly LazyConcurrentDictionary<string, Task> InitializationTasks;
 
+    protected override string AdjustConnectionStringOnSeeding(string connectionString)
+    {
+        // Required to be able to get password from DbContext.Database.GetConnectionString()
+        return "Persist Security Info=true;" + connectionString;
+    }
+
     /// <summary>
     /// Returns a PostgreSQL connection string to be used in the test.
     /// Runs <paramref name="initializeDatabase"/> function for the first test in a sequence.
