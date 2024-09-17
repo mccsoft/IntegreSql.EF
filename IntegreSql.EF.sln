@@ -12,6 +12,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleWeb.IntegrationTests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleWeb.UnitTests", "tests\ExampleWeb.UnitTests\ExampleWeb.UnitTests.csproj", "{AB078860-06D1-4611-BBBA-1D7E96C9B421}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleWebPostgresSpecific", "examples\ExampleWebPostgresSpecific\ExampleWebPostgresSpecific.csproj", "{3AD86800-36E2-48B9-A3A0-428B6C0EEBFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleWebPostgresSpecific.UnitTests", "tests\ExampleWebPostgresSpecific.UnitTests\ExampleWebPostgresSpecific.UnitTests.csproj", "{8538E23A-C48D-4229-91CE-3767198CB583}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,10 +38,20 @@ Global
 		{AB078860-06D1-4611-BBBA-1D7E96C9B421}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB078860-06D1-4611-BBBA-1D7E96C9B421}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB078860-06D1-4611-BBBA-1D7E96C9B421}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AD86800-36E2-48B9-A3A0-428B6C0EEBFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AD86800-36E2-48B9-A3A0-428B6C0EEBFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AD86800-36E2-48B9-A3A0-428B6C0EEBFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AD86800-36E2-48B9-A3A0-428B6C0EEBFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8538E23A-C48D-4229-91CE-3767198CB583}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8538E23A-C48D-4229-91CE-3767198CB583}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8538E23A-C48D-4229-91CE-3767198CB583}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8538E23A-C48D-4229-91CE-3767198CB583}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B8D87F8F-F622-48A1-BEEA-4C8BA6B1F6E9} = {0F0A5C71-7CAD-46EB-9A89-21CDDA43815D}
 		{802044F5-BD36-4ECD-8ABD-96E742EE6F36} = {6A62837E-674A-444E-AEF4-177681A1D816}
 		{AB078860-06D1-4611-BBBA-1D7E96C9B421} = {6A62837E-674A-444E-AEF4-177681A1D816}
+		{3AD86800-36E2-48B9-A3A0-428B6C0EEBFE} = {0F0A5C71-7CAD-46EB-9A89-21CDDA43815D}
+		{8538E23A-C48D-4229-91CE-3767198CB583} = {6A62837E-674A-444E-AEF4-177681A1D816}
 	EndGlobalSection
 EndGlobal

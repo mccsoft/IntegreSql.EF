@@ -49,7 +49,8 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     public void UseProvider<TDbContext>(
         DbContextOptionsBuilder options,
         DatabaseSeedingOptions<TDbContext> databaseSeedingOptions
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         string connectionString = CreateDatabaseGetConnectionString(databaseSeedingOptions)
             .ConfigureAwait(false)
@@ -61,7 +62,8 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     /// <inheritdoc cref="IDatabaseInitializer.CreateDatabaseGetConnectionString{TDbContext}"/>
     public Task<string> CreateDatabaseGetConnectionString<TDbContext>(
         DatabaseSeedingOptions<TDbContext> databaseSeeding
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         string lastMigrationName = ContextHelper.GetLastMigrationName<TDbContext>() ?? "";
 
@@ -72,9 +74,11 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
                 + typeof(TDbContext).Assembly.FullName,
             async (connectionString) =>
             {
+                // Required to be able to get password from DbContext.Database.GetConnectionString()
+                var newConnectionString = "Persist Security Info=true;" + connectionString;
                 await using var dbContext = ContextHelper.CreateDbContext<TDbContext>(
                     useProvider: this,
-                    connectionString: connectionString,
+                    connectionString: newConnectionString,
                     factoryMethod: databaseSeeding?.DbContextFactory
                 );
                 if (databaseSeeding?.DisableEnsureCreated != true)
@@ -92,7 +96,8 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     /// <inheritdoc cref="IDatabaseInitializer.CreateDatabaseGetConnectionStringSync{TDbContext}"/>
     public string CreateDatabaseGetConnectionStringSync<TDbContext>(
         DatabaseSeedingOptions<TDbContext> databaseSeeding = null
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         return TaskUtils.RunSynchronously(() => CreateDatabaseGetConnectionString(databaseSeeding));
     }
@@ -100,7 +105,8 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     /// <inheritdoc cref="IDatabaseInitializer.CreateDbContextOptionsBuilder{TDbContext}"/>
     public virtual DbContextOptionsBuilder<TDbContext> CreateDbContextOptionsBuilder<TDbContext>(
         string connectionString
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         var builder = new DbContextOptionsBuilder<TDbContext>();
         UseProvider(builder, connectionString);
@@ -114,7 +120,8 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
         DbContextOptionsBuilder<TDbContext>
     > CreateDatabaseGetDbContextOptionsBuilder<TDbContext>(
         DatabaseSeedingOptions<TDbContext> seedingOptions
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         var connectionString = await CreateDatabaseGetConnectionString(seedingOptions);
         return CreateDbContextOptionsBuilder<TDbContext>(connectionString);
@@ -123,7 +130,8 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     /// <inheritdoc cref="IDatabaseInitializer.CreateDatabaseGetDbContextOptionsBuilderSync{TDbContext}"/>
     public virtual DbContextOptionsBuilder<TDbContext> CreateDatabaseGetDbContextOptionsBuilderSync<TDbContext>(
         DatabaseSeedingOptions<TDbContext> seedingOptions = null
-    ) where TDbContext : DbContext
+    )
+        where TDbContext : DbContext
     {
         return TaskUtils.RunSynchronously(
             () => CreateDatabaseGetDbContextOptionsBuilder(seedingOptions)
