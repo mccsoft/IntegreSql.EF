@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MccSoft.IntegreSql.EF.DatabaseInitialization;
 using MccSoft.IntegreSql.EF.Dto;
@@ -229,12 +230,21 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
         }
     }
 
+    private ConcurrentDictionary<string, NpgsqlDataSource> _dataSourceBuilderCache = new();
+
     public override void UseProvider(DbContextOptionsBuilder options, string connectionString)
     {
         base.UseProvider(options, connectionString);
-        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-        _adjustNpgsqlDataSource?.Invoke(dataSourceBuilder);
-        var dataSource = dataSourceBuilder.Build();
+        var dataSource = _dataSourceBuilderCache.GetOrAdd(
+            connectionString,
+            s =>
+            {
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+                _adjustNpgsqlDataSource?.Invoke(dataSourceBuilder);
+                var dataSource = dataSourceBuilder.Build();
+                return dataSource;
+            }
+        );
 
         options.UseNpgsql(dataSource, _npgsqlOptionsAction);
         _optionsAction?.Invoke(options);
@@ -256,6 +266,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
             Password = ConnectionStringOverride?.Password ?? databaseConfig.Password,
             Pooling = false,
             IncludeErrorDetail = true,
+            PersistSecurityInfo = true,
             //KeepAlive = 0,
         };
         var connectionString = builder.ToString();
