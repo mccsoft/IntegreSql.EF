@@ -6,6 +6,7 @@ using MccSoft.IntegreSql.EF.Dto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Npgsql;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
 namespace MccSoft.IntegreSql.EF;
 
@@ -16,6 +17,8 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 {
     private readonly IntegreSqlClient _integreSqlClient;
     private readonly Action<NpgsqlDataSourceBuilder> _adjustNpgsqlDataSource;
+    private readonly Action<NpgsqlDbContextOptionsBuilder> _npgsqlOptionsAction;
+    private readonly Action<DbContextOptionsBuilder> _optionsAction;
 
     /// <summary>
     /// When <see cref="GetConnectionString"/> is called, IntegreSQL returns a connection string it uses to connect to PostgreSQL.
@@ -65,12 +68,17 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     public NpgsqlDatabaseInitializer(
         Uri integreSqlUri = null,
         ConnectionStringOverride connectionStringOverride = null,
-        Action<NpgsqlDataSourceBuilder> adjustNpgsqlDataSource = null
+        Action<NpgsqlDataSourceBuilder> adjustNpgsqlDataSource = null, 
+        Action<NpgsqlDbContextOptionsBuilder> npgsqlOptionsAction = null,
+        Action<DbContextOptionsBuilder> optionsAction = null
+
     )
     {
         integreSqlUri ??= new Uri("http://localhost:5000/api/v1/");
         _integreSqlClient = new IntegreSqlClient(integreSqlUri);
         _adjustNpgsqlDataSource = adjustNpgsqlDataSource;
+        _npgsqlOptionsAction = npgsqlOptionsAction;
+        _optionsAction = optionsAction;
         ConnectionStringOverride = connectionStringOverride;
     }
 
@@ -228,7 +236,8 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
         _adjustNpgsqlDataSource?.Invoke(dataSourceBuilder);
         var dataSource = dataSourceBuilder.Build();
 
-        options.UseNpgsql(dataSource);
+        options.UseNpgsql(dataSource, _npgsqlOptionsAction);
+        _optionsAction?.Invoke(options);
     }
 
     protected override void PerformBasicSeedingOperations(DbContext dbContext)

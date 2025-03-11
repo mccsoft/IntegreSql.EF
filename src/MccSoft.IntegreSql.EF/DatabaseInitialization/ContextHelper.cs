@@ -13,10 +13,14 @@ public class ContextHelper
     /// Tries to create the DbContext using the passed factory method,
     /// or by using a constructor with DbContextOptions as a first argument and nulls as all the rest.
     /// </summary>
-    public static string? GetLastMigrationName<T>(Func<DbContextOptions<T>, T> factoryMethod = null)
+    public static string? GetLastMigrationName<T>(IUseProvider useProvider = null,
+        Func<DbContextOptions<T>, T> factoryMethod = null)
         where T : DbContext
     {
-        var dbContext = CreateDbContext(new NpgsqlDatabaseInitializer(), factoryMethod);
+        // Use the provided useProvider or create a default one
+        useProvider ??= new NpgsqlDatabaseInitializer();
+
+        var dbContext = CreateDbContext(useProvider, factoryMethod);
         var assemblyMigrations = dbContext.Database.GetMigrations();
         return assemblyMigrations.LastOrDefault();
     }
