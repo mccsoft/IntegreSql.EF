@@ -74,7 +74,7 @@ public abstract class BaseDatabaseInitializer : IDatabaseInitializer
     )
         where TDbContext : DbContext
     {
-        string lastMigrationName = ContextHelper.GetLastMigrationName<TDbContext>() ?? "";
+        string lastMigrationName = ContextHelper.GetLastMigrationName<TDbContext>(useProvider: this) ?? "";
 
         return CreateDatabaseGetConnectionStringInternal(
             databaseSeeding?.Name
