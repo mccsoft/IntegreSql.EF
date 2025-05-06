@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>0.11.2</Version>
+        <Version>0.12.1</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Authors>MCC Soft</Authors>
-        <Description>OpenIddict extension to support Auth code flow fo built-in ASP.Net identity providers</Description>
+        <Description>Infrastructure to easily write **FAST** integration and unit tests using **REAL** databases in ASP.Net Core using EntityFramework.</Description>
         <RepositoryUrl>https://github.com/mcctomsk/IntegreSql.EF</RepositoryUrl>
         <PackageProjectUrl>https://github.com/mcctomsk/IntegreSql.EF</PackageProjectUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
