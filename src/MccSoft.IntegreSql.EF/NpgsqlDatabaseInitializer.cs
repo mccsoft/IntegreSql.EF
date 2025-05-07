@@ -69,10 +69,9 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
     public NpgsqlDatabaseInitializer(
         Uri integreSqlUri = null,
         ConnectionStringOverride connectionStringOverride = null,
-        Action<NpgsqlDataSourceBuilder> adjustNpgsqlDataSource = null, 
+        Action<NpgsqlDataSourceBuilder> adjustNpgsqlDataSource = null,
         Action<NpgsqlDbContextOptionsBuilder> npgsqlOptionsAction = null,
         Action<DbContextOptionsBuilder> optionsAction = null
-
     )
     {
         integreSqlUri ??= new Uri("http://localhost:5000/api/v1/");
@@ -230,23 +229,23 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
         }
     }
 
-    private ConcurrentDictionary<string, NpgsqlDataSource> _dataSourceBuilderCache = new();
-
     public override void UseProvider(DbContextOptionsBuilder options, string connectionString)
     {
         base.UseProvider(options, connectionString);
-        var dataSource = _dataSourceBuilderCache.GetOrAdd(
-            connectionString,
-            s =>
-            {
-                var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-                _adjustNpgsqlDataSource?.Invoke(dataSourceBuilder);
-                var dataSource = dataSourceBuilder.Build();
-                return dataSource;
-            }
-        );
 
-        options.UseNpgsql(dataSource, _npgsqlOptionsAction);
+        if (_adjustNpgsqlDataSource != null)
+        {
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+            _adjustNpgsqlDataSource?.Invoke(dataSourceBuilder);
+            var dataSource = dataSourceBuilder.Build();
+
+            options.UseNpgsql(dataSource, _npgsqlOptionsAction);
+        }
+        else
+        {
+            options.UseNpgsql(connectionString, _npgsqlOptionsAction);
+        }
+
         _optionsAction?.Invoke(options);
     }
 

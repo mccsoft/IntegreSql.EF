@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>0.12.1</Version>
+        <Version>0.12.2</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Authors>MCC Soft</Authors>
         <Description>Infrastructure to easily write **FAST** integration and unit tests using **REAL** databases in ASP.Net Core using EntityFramework.</Description>
