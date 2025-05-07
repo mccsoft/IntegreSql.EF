@@ -4,13 +4,18 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<UserService>();
-builder.Services.AddDbContext<ExampleDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetValue<string>("Postgres"))
-);
-
-// builder.Services.AddDbContext<ExampleDbContext>(
-//     options => options.UseSqlite(builder.Configuration.GetValue<string>("Sqlite"))
-// );
+if (builder.Environment.IsEnvironment("sqlite"))
+{
+    builder.Services.AddDbContext<ExampleDbContext>(options =>
+        options.UseSqlite(builder.Configuration.GetValue<string>("Sqlite"))
+    );
+}
+else
+{
+    builder.Services.AddDbContext<ExampleDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetValue<string>("Postgres"))
+    );
+}
 
 var app = builder.Build();
 

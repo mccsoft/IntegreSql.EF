@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using ExampleWebPostgresSpecific.Database;
 using MccSoft.IntegreSql.EF;
 using MccSoft.IntegreSql.EF.DatabaseInitialization;
 using Microsoft.AspNetCore.Hosting;
@@ -22,12 +23,11 @@ public class IntegrationTestBase : IDisposable
     {
         _databaseInitializer = CreateDatabaseInitializer(databaseType);
         _connectionString = _databaseInitializer.CreateDatabaseGetConnectionStringSync(
-            new DatabaseSeedingOptions<ExampleDbContext>(Name: "Integration")
+            new DatabaseSeedingOptions<ExamplePostgresSpecificDbContext>(Name: "Integration")
         );
 
         var webAppFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
-            builder.UseEnvironment(databaseType == DatabaseType.Sqlite ? "sqlite" : "postgres");
             builder.ConfigureAppConfiguration(
                 (context, configuration) =>
                 {
@@ -39,11 +39,11 @@ public class IntegrationTestBase : IDisposable
             builder.ConfigureServices(services =>
             {
                 var descriptor = services.Single(d =>
-                    d.ServiceType == typeof(DbContextOptions<ExampleDbContext>)
+                    d.ServiceType == typeof(DbContextOptions<ExamplePostgresSpecificDbContext>)
                 );
                 services.Remove(descriptor);
 
-                services.AddDbContext<ExampleDbContext>(options =>
+                services.AddDbContext<ExamplePostgresSpecificDbContext>(options =>
                     _databaseInitializer.UseProvider(options, _connectionString)
                 );
             });
@@ -61,6 +61,7 @@ public class IntegrationTestBase : IDisposable
                     // This is needed if you run tests NOT inside the container.
                     // 5434 is the public port number of Postgresql instance
                     connectionStringOverride: new() { Host = "localhost", Port = 5434, }
+                //npgsqlOptionsAction:
                 )
                 {
                     DropDatabaseOnRemove = true,

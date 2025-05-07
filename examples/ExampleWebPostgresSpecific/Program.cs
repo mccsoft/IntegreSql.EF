@@ -6,12 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<UserService>();
 builder.Services.AddDbContext<ExamplePostgresSpecificDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetValue<string>("Postgres"))
+    options.UseNpgsql(
+        builder.Configuration.GetValue<string>("Postgres"),
+        options => ExamplePostgresSpecificDbContext.MapEnums(options)
+    )
 );
-
-// builder.Services.AddDbContext<ExampleDbContext>(
-//     options => options.UseSqlite(builder.Configuration.GetValue<string>("Sqlite"))
-// );
 
 var app = builder.Build();
 
