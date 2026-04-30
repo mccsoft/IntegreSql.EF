@@ -175,6 +175,7 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 
     private async Task WaitUntilDatabaseIsCreated(string connectionString)
     {
+        PostgresException lastException = null;
         for (int i = 0; i < 100; i++)
         {
             try
@@ -185,9 +186,15 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
             }
             catch (PostgresException e) when (e.SqlState == "3D000")
             {
+                lastException = e;
                 await Task.Delay(TimeSpan.FromMilliseconds(100));
             }
         }
+
+        throw new InvalidOperationException(
+            "Database did not become reachable within the retry budget of WaitUntilDatabaseIsCreated.",
+            lastException
+        );
     }
 
     /// <summary>
