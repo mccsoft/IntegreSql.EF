@@ -175,19 +175,36 @@ public class NpgsqlDatabaseInitializer : BaseDatabaseInitializer
 
     private async Task WaitUntilDatabaseIsCreated(string connectionString)
     {
+        var probeConnectionString = new NpgsqlConnectionStringBuilder(connectionString)
+        {
+            Timeout = 2,
+        }.ToString();
+
+        Exception lastException = null;
         for (int i = 0; i < 100; i++)
         {
             try
             {
-                await using var conn = new NpgsqlConnection(connectionString);
+                await using var conn = new NpgsqlConnection(probeConnectionString);
                 await conn.OpenAsync();
                 return;
             }
             catch (PostgresException e) when (e.SqlState == "3D000")
             {
+                lastException = e;
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
+            }
+            catch (NpgsqlException e) when (e is not PostgresException)
+            {
+                lastException = e;
                 await Task.Delay(TimeSpan.FromMilliseconds(100));
             }
         }
+
+        throw new InvalidOperationException(
+            "Database did not become reachable within the retry budget of WaitUntilDatabaseIsCreated.",
+            lastException
+        );
     }
 
     /// <summary>
